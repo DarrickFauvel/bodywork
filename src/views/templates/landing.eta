@@ -184,6 +184,7 @@
     Bodywork
   </a>
   <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
+  <a href="/logout" class="btn btn-ghost btn-sm">Sign Out</a>
 </nav>
 
 <section class="land-hero">
