@@ -1,0 +1,44 @@
+<div class="page-header">
+  <div>
+    <div class="page-title">Customers</div>
+    <div class="page-subtitle"><%= it.customers.length %> total</div>
+  </div>
+  <div class="btn-group">
+    <a href="/admin/customers/new" class="btn btn-primary">+ New Customer</a>
+  </div>
+</div>
+<div class="page-body">
+  <% if (it.customers.length === 0) { %>
+  <div class="empty-state">
+    <p>No customers yet.</p>
+    <a href="/admin/customers/new" class="btn btn-primary">Add your first customer</a>
+  </div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Added</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% it.customers.forEach(c => { %>
+        <tr>
+          <td><a href="/admin/customers/<%= c.id %>"><%= c.name %></a></td>
+          <td class="text-muted"><%= c.phone || '—' %></td>
+          <td class="text-muted"><%= c.email || '—' %></td>
+          <td class="text-muted"><%= it.fmtDate(c.createdAt) %></td>
+          <td>
+            <a href="/admin/customers/<%= c.id %>/edit" class="btn btn-xs btn-ghost">Edit</a>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>

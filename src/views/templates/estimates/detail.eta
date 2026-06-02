@@ -1,0 +1,213 @@
+<% const vehicle = it.vehicle %>
+<% const est = it.estimate %>
+<% const shareUrl = it.shareUrl %>
+
+<div data-signals='{
+  "toast": "",
+  "redirect": ""
+}'>
+<div data-effect="if ($redirect) { window.location.href = $redirect }"></div>
+<div data-show="$toast !== ''" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;">
+  <div class="toast">
+    <span data-text="$toast"></span>
+    <button data-on:click="$toast = ''"
+      style="background:none;border:none;color:var(--text-muted);cursor:pointer;margin-left:0.75rem;">✕</button>
+  </div>
+</div>
+
+<div class="page-header">
+  <div>
+    <div class="page-title"><%= est.title %></div>
+    <div class="page-subtitle">
+      <a href="/admin/estimates">← Estimates</a>
+      &nbsp;·&nbsp;
+      <a href="/admin/customers/<%= it.customer.id %>"><%= it.customer.name %></a>
+    </div>
+  </div>
+  <div class="btn-group">
+    <form method="POST" action="/admin/estimates/<%= est.id %>/delete">
+      <button type="submit" class="btn btn-danger btn-sm"
+        onclick="return confirm('Delete this estimate?')">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="page-body">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span id="status-badge"><status-badge status="<%= est.status %>"></status-badge></span>
+    <span class="text-muted" style="font-size:0.8rem;">Created <%= it.fmtDate(est.createdAt) %></span>
+    <div class="btn-group" style="margin-left:auto;">
+      <% if (est.status === 'draft') { %>
+      <button class="btn btn-sm btn-ghost"
+        data-on:click="@post('/sse/estimates/<%= est.id %>/status?action=send')">
+        Send to Customer
+      </button>
+      <% } %>
+      <% if (est.status === 'sent') { %>
+      <button class="btn btn-sm btn-success"
+        data-on:click="@post('/sse/estimates/<%= est.id %>/status?action=approve')">
+        ✓ Approved
+      </button>
+      <button class="btn btn-sm btn-danger"
+        data-on:click="@post('/sse/estimates/<%= est.id %>/status?action=decline')">
+        Decline
+      </button>
+      <% } %>
+      <% if (est.status === 'approved') { %>
+      <button class="btn btn-sm btn-primary"
+        data-on:click="@post('/sse/estimates/<%= est.id %>/convert')">
+        Convert to Invoice →
+      </button>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (shareUrl) { %>
+  <div class="share-link-box mb-2">
+    <span>Customer link:</span>
+    <code><%= shareUrl %></code>
+    <copy-button class="btn btn-xs btn-ghost" text="<%= shareUrl %>">Copy</copy-button>
+    <a href="<%= shareUrl %>" target="_blank" class="btn btn-xs btn-ghost">Preview ↗</a>
+  </div>
+  <% } %>
+
+  <!-- Editable Header -->
+  <div id="estimate-header">
+    <div class="card">
+      <div class="card-title">Estimate Details</div>
+      <div class="detail-header-wrap">
+        <div class="detail-header">
+          <div>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" data-bind:title value="<%= est.title %>" />
+            </div>
+            <div class="form-group">
+              <label>Tax Rate (%)</label>
+              <input type="number" name="taxRate" data-bind:taxRate step="0.1" min="0" max="100"
+                value="<%= (est.taxRate * 100).toFixed(1) %>" style="width:120px;" />
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea name="notes" data-bind:notes><%= est.notes || '' %></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Year</label>
+                <input type="text" name="vYear" data-bind:vYear value="<%= vehicle.year || '' %>" />
+              </div>
+              <div class="form-group">
+                <label>Make</label>
+                <input type="text" name="vMake" data-bind:vMake value="<%= vehicle.make || '' %>" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Model</label>
+                <input type="text" name="vModel" data-bind:vModel value="<%= vehicle.model || '' %>" />
+              </div>
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" name="vColor" data-bind:vColor value="<%= vehicle.color || '' %>" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>VIN</label>
+              <input type="text" name="vVin" data-bind:vVin value="<%= vehicle.vin || '' %>" />
+            </div>
+            <div class="form-group">
+              <label>Mileage</label>
+              <input type="text" name="vMileage" data-bind:vMileage value="<%= vehicle.mileage || '' %>" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary"
+          data-on:click="@post('/sse/estimates/<%= est.id %>/save')">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Line Items -->
+  <div class="line-items-section">
+    <div class="line-items-header">
+      <h3 style="font-size:1rem;font-weight:700;">Line Items</h3>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:75px;">Type</th>
+            <th>Description</th>
+            <th class="col-num">Detail</th>
+            <th class="col-num">Subtotal</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody id="line-items-body">
+          <%~ it.lineItemsHtml %>
+        </tbody>
+        <%~ it.totalsHtml %>
+      </table>
+    </div>
+
+    <!-- Add Line Item -->
+    <div class="add-item-wrap">
+      <line-item-type-fields>
+        <div class="add-item-row">
+          <div class="form-group">
+            <label>Type</label>
+            <select name="newType" data-bind:newType style="width:110px;">
+              <option value="labor">Labor</option>
+              <option value="parts">Parts</option>
+              <option value="paint">Paint</option>
+              <option value="sublet">Sublet</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:2;">
+            <label>Description</label>
+            <input type="text" name="newDesc" data-bind:newDesc placeholder="Description..." />
+          </div>
+          <div data-for-type="labor" class="form-group">
+            <label>Hours</label>
+            <input type="number" name="newHours" data-bind:newHours step="0.5" min="0" style="width:80px;" />
+          </div>
+          <div data-for-type="labor" class="form-group">
+            <label>Rate/hr ($)</label>
+            <input type="number" name="newRate" data-bind:newRate step="0.01" min="0" style="width:90px;"
+              value="<%= it.settings.defaultLaborRate %>" />
+          </div>
+          <div data-for-type="parts,paint" class="form-group">
+            <label>Part #</label>
+            <input type="text" name="newPartNum" data-bind:newPartNum style="width:100px;" placeholder="Optional" />
+          </div>
+          <div data-for-type="parts,paint" class="form-group">
+            <label>Qty</label>
+            <input type="number" name="newQty" data-bind:newQty step="0.01" min="0" style="width:70px;" value="1" />
+          </div>
+          <div data-for-type="parts,paint" class="form-group">
+            <label>Unit Price ($)</label>
+            <input type="number" name="newUnitPrice" data-bind:newUnitPrice step="0.01" min="0" style="width:90px;" />
+          </div>
+          <div data-for-type="sublet" class="form-group">
+            <label>Flat Price ($)</label>
+            <input type="number" name="newFlat" data-bind:newFlat step="0.01" min="0" style="width:100px;" />
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary"
+              data-on:click="@post('/sse/estimates/<%= est.id %>/line-items')">
+              + Add
+            </button>
+          </div>
+        </div>
+      </line-item-type-fields>
+    </div>
+  </div>
+</div><!-- /data-signals -->

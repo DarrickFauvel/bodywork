@@ -1,0 +1,51 @@
+<% const TABS = ['all','draft','sent','approved','declined'] %>
+<div class="page-header">
+  <div>
+    <div class="page-title">Estimates</div>
+    <div class="page-subtitle"><%= it.estimates.length %> shown</div>
+  </div>
+  <div class="btn-group">
+    <a href="/admin/estimates/new" class="btn btn-primary">+ New Estimate</a>
+  </div>
+</div>
+<div class="page-body">
+  <div class="filter-tabs">
+    <% TABS.forEach(t => { %>
+    <a href="/admin/estimates?tab=<%= t %>" class="filter-tab <%= it.activeTab === t ? 'active' : '' %>">
+      <%= t.charAt(0).toUpperCase() + t.slice(1) %>
+    </a>
+    <% }) %>
+  </div>
+
+  <% if (it.estimates.length === 0) { %>
+  <div class="empty-state">
+    <p>No estimates<%= it.activeTab !== 'all' ? ' with status "' + it.activeTab + '"' : '' %>.</p>
+    <a href="/admin/estimates/new" class="btn btn-primary">Create one</a>
+  </div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% it.estimates.forEach(e => { %>
+        <tr>
+          <td><a href="/admin/customers/<%= e.customerId %>"><%= e.customerName %></a></td>
+          <td><%= e.title %></td>
+          <td><status-badge status="<%= e.status %>"></status-badge></td>
+          <td class="text-muted"><%= it.fmtDate(e.createdAt) %></td>
+          <td><a href="/admin/estimates/<%= e.id %>" class="btn btn-xs btn-ghost">Open</a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice — <%= it.settings.shopName || 'Bodywork' %></title>
+  <link rel="stylesheet" href="/public/styles.css" />
+  <script type="module" src="/public/components.js"></script>
+</head>
+<body>
+<div class="public-wrap">
+  <div class="public-doc">
+    <div class="public-doc-header">
+      <div class="doc-shop-info">
+        <h2><%= it.settings.shopName || 'Auto Body Shop' %></h2>
+        <% if (it.settings.phone) { %><p><%= it.settings.phone %></p><% } %>
+        <% if (it.settings.email) { %><p><%= it.settings.email %></p><% } %>
+        <% if (it.settings.address) { %><p><%= it.settings.address %></p><% } %>
+      </div>
+      <div class="doc-number" style="text-align:right;">
+        <h3>INVOICE</h3>
+        <p>Date: <%= it.fmtDate(it.invoice.createdAt) %></p>
+        <% if (it.invoice.dueDate) { %>
+        <p>Due: <%= it.fmtDate(it.invoice.dueDate) %></p>
+        <% } %>
+        <p><status-badge status="<%= it.invoice.status %>"></status-badge></p>
+        <% if (it.invoice.status === 'paid') { %>
+        <p style="color:var(--success);font-weight:700;">PAID <%= it.fmtDate(it.invoice.paidAt) %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="doc-customer-vehicle-wrap">
+      <div class="doc-customer-vehicle">
+        <div>
+          <div class="doc-section-label">Bill To</div>
+          <div class="doc-section-value"><strong><%= it.customer.name %></strong></div>
+          <% if (it.customer.phone) { %><div class="doc-section-value"><%= it.customer.phone %></div><% } %>
+          <% if (it.customer.email) { %><div class="doc-section-value"><%= it.customer.email %></div><% } %>
+          <% if (it.customer.address) { %><div class="doc-section-value"><%= it.customer.address %></div><% } %>
+        </div>
+        <div>
+          <div class="doc-section-label">Vehicle</div>
+          <vehicle-summary
+            year="<%= it.vehicle.year || '' %>"
+            make="<%= it.vehicle.make || '' %>"
+            model="<%= it.vehicle.model || '' %>"
+            color="<%= it.vehicle.color || '' %>"
+            vin="<%= it.vehicle.vin || '' %>"
+            mileage="<%= it.vehicle.mileage || '' %>">
+          </vehicle-summary>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:75px;">Type</th>
+            <th>Description</th>
+            <th class="col-num">Detail</th>
+            <th class="col-num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%~ it.lineItemsHtml %>
+        </tbody>
+        <%~ it.totalsHtml %>
+      </table>
+    </div>
+
+    <% if (it.invoice.notes) { %>
+    <div class="mt-2">
+      <div class="doc-section-label">Notes</div>
+      <p class="text-muted"><%= it.invoice.notes %></p>
+    </div>
+    <% } %>
+
+    <div class="mt-3 btn-group no-print">
+      <button class="btn btn-ghost" onclick="window.print()">&#128438; Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
