@@ -84,7 +84,7 @@ app.get("/admin/settings", requireAdmin, async (c) => {
   return c.html(await renderLayout(c, {
     title: "Settings",
     activeNav: "settings",
-    content: await render("./settings", { settings }),
+    content: await render("./settings", { settings, isSuperAdmin: c.get("isSuperAdmin") }),
   }))
 })
 
