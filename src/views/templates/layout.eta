@@ -3,57 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f97316" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bodywork" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title><%= it.title %> — Bodywork</title>
   <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="manifest" href="/public/manifest.json" />
+  <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
   <script type="module" src="/public/components.js"></script>
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js"></script>
 </head>
 <body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <div class="app-shell">
-  <nav class="sidebar">
+  <!-- Desktop sidebar -->
+  <nav class="sidebar" aria-label="Main navigation">
     <div class="sidebar-logo">
       <a href="/admin/dashboard">
-        <span class="logo-icon">&#9881;</span>
+        <span class="logo-icon" aria-hidden="true">&#9881;</span>
         Bodywork
       </a>
     </div>
     <div class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <a href="/admin/dashboard" class="nav-link <%= it.activeNav === 'dashboard' ? 'active' : '' %>">
-        <span class="nav-icon">&#9632;</span> Dashboard
+      <div class="nav-section" aria-hidden="true">Main</div>
+      <a href="/admin/dashboard" class="nav-link <%= it.activeNav === 'dashboard' ? 'active' : '' %>"
+        aria-current="<%= it.activeNav === 'dashboard' ? 'page' : 'false' %>">
+        <span class="nav-icon" aria-hidden="true">&#9632;</span> Dashboard
       </a>
-      <a href="/admin/estimates" class="nav-link <%= it.activeNav === 'estimates' ? 'active' : '' %>">
-        <span class="nav-icon">&#128203;</span> Estimates
+      <a href="/admin/estimates" class="nav-link <%= it.activeNav === 'estimates' ? 'active' : '' %>"
+        aria-current="<%= it.activeNav === 'estimates' ? 'page' : 'false' %>">
+        <span class="nav-icon" aria-hidden="true">&#128203;</span> Estimates
       </a>
-      <a href="/admin/invoices" class="nav-link <%= it.activeNav === 'invoices' ? 'active' : '' %>">
-        <span class="nav-icon">&#128196;</span> Invoices
+      <a href="/admin/invoices" class="nav-link <%= it.activeNav === 'invoices' ? 'active' : '' %>"
+        aria-current="<%= it.activeNav === 'invoices' ? 'page' : 'false' %>">
+        <span class="nav-icon" aria-hidden="true">&#128196;</span> Invoices
       </a>
-      <div class="nav-section">Manage</div>
-      <a href="/admin/customers" class="nav-link <%= it.activeNav === 'customers' ? 'active' : '' %>">
-        <span class="nav-icon">&#128100;</span> Customers
+      <div class="nav-section" aria-hidden="true">Manage</div>
+      <a href="/admin/customers" class="nav-link <%= it.activeNav === 'customers' ? 'active' : '' %>"
+        aria-current="<%= it.activeNav === 'customers' ? 'page' : 'false' %>">
+        <span class="nav-icon" aria-hidden="true">&#128100;</span> Customers
       </a>
-      <a href="/admin/settings" class="nav-link <%= it.activeNav === 'settings' ? 'active' : '' %>">
-        <span class="nav-icon">&#9881;</span> Settings
+      <a href="/admin/settings" class="nav-link <%= it.activeNav === 'settings' ? 'active' : '' %>"
+        aria-current="<%= it.activeNav === 'settings' ? 'page' : 'false' %>">
+        <span class="nav-icon" aria-hidden="true">&#9881;</span> Settings
       </a>
     </div>
     <div class="sidebar-footer">
-      <button id="signOutBtn" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.8rem;padding:0;">
+      <button id="signOutBtnSidebar" class="btn btn-ghost btn-sm" style="width:100%;">
         &#8592; Sign out
       </button>
-      <script>
-        document.getElementById('signOutBtn').addEventListener('click', async () => {
-          await fetch('/auth/sign-out', { method: 'POST' })
-          window.location.href = '/login'
-        })
-      </script>
     </div>
   </nav>
-  <main class="main-content">
+
+  <!-- Main content -->
+  <main class="main-content" id="main-content">
     <%~ it.content %>
   </main>
 </div>
-<div id="toast-anchor">
+
+<!-- Mobile bottom nav -->
+<nav class="bottom-nav" aria-label="Main navigation">
+  <a href="/admin/dashboard" class="bottom-nav-item <%= it.activeNav === 'dashboard' ? 'active' : '' %>"
+    aria-current="<%= it.activeNav === 'dashboard' ? 'page' : 'false' %>">
+    <span class="bottom-nav-icon" aria-hidden="true">&#9632;</span>
+    <span>Home</span>
+  </a>
+  <a href="/admin/estimates" class="bottom-nav-item <%= it.activeNav === 'estimates' ? 'active' : '' %>"
+    aria-current="<%= it.activeNav === 'estimates' ? 'page' : 'false' %>">
+    <span class="bottom-nav-icon" aria-hidden="true">&#128203;</span>
+    <span>Estimates</span>
+  </a>
+  <a href="/admin/invoices" class="bottom-nav-item <%= it.activeNav === 'invoices' ? 'active' : '' %>"
+    aria-current="<%= it.activeNav === 'invoices' ? 'page' : 'false' %>">
+    <span class="bottom-nav-icon" aria-hidden="true">&#128196;</span>
+    <span>Invoices</span>
+  </a>
+  <a href="/admin/customers" class="bottom-nav-item <%= it.activeNav === 'customers' ? 'active' : '' %>"
+    aria-current="<%= it.activeNav === 'customers' ? 'page' : 'false' %>">
+    <span class="bottom-nav-icon" aria-hidden="true">&#128100;</span>
+    <span>Customers</span>
+  </a>
+  <a href="/admin/settings" class="bottom-nav-item <%= it.activeNav === 'settings' ? 'active' : '' %>"
+    aria-current="<%= it.activeNav === 'settings' ? 'page' : 'false' %>">
+    <span class="bottom-nav-icon" aria-hidden="true">&#9881;</span>
+    <span>Settings</span>
+  </a>
+</nav>
+
+<div id="toast-anchor" aria-live="polite" aria-atomic="true">
   <toast-message id="toast-msg" style="display:none;" class="toast"></toast-message>
 </div>
+
+<script>
+  // Sign out handler
+  document.querySelectorAll('#signOutBtnSidebar').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await fetch('/auth/sign-out', { method: 'POST' })
+      window.location.href = '/login'
+    })
+  })
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/public/sw.js').catch(() => {})
+  }
+</script>
 </body>
 </html>
