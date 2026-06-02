@@ -1,11 +1,11 @@
 /* ── Wordmark ───────────────────────────────────────────────────────────── */
 /* On dark surfaces (default) */
 .wordmark      { display: inline-block; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-family: var(--font, system-ui, sans-serif); }
-.wordmark-body { color: #93c5fd; }   /* blue-300 */
-.wordmark-work { color: #dbeafe; }   /* blue-100 */
+.wordmark-body { color: var(--text); }        /* off-white */
+.wordmark-work { color: var(--accent); }      /* orange */
 /* On light/white surfaces */
-.wordmark-on-light .wordmark-body { color: #1e40af; }   /* blue-800 */
-.wordmark-on-light .wordmark-work { color: #2563eb; }   /* blue-600 */
+.wordmark-on-light .wordmark-body { color: #1a1a1a; }
+.wordmark-on-light .wordmark-work { color: var(--accent); }
 
 /* ── Custom Properties ─────────────────────────────────────────────────── */
 :root {
