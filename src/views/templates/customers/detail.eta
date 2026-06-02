@@ -1,0 +1,83 @@
+<div class="page-header">
+  <div>
+    <div class="page-title"><%= it.customer.name %></div>
+    <div class="page-subtitle"><a href="/admin/customers">← Customers</a></div>
+  </div>
+  <div class="btn-group">
+    <a href="/admin/customers/<%= it.customer.id %>/edit" class="btn btn-ghost">Edit</a>
+    <a href="/admin/estimates/new?customerId=<%= it.customer.id %>" class="btn btn-primary">+ New Estimate</a>
+  </div>
+</div>
+<div class="page-body">
+  <div class="card" style="max-width:500px;">
+    <div class="card-title">Contact Info</div>
+    <div class="form-row">
+      <div>
+        <div class="doc-section-label">Phone</div>
+        <div><%= it.customer.phone || '—' %></div>
+      </div>
+      <div>
+        <div class="doc-section-label">Email</div>
+        <div><%= it.customer.email || '—' %></div>
+      </div>
+    </div>
+    <% if (it.customer.address) { %>
+    <div class="mt-1">
+      <div class="doc-section-label">Address</div>
+      <div><%= it.customer.address %></div>
+    </div>
+    <% } %>
+    <% if (it.customer.notes) { %>
+    <div class="mt-1">
+      <div class="doc-section-label">Notes</div>
+      <div class="text-muted"><%= it.customer.notes %></div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Estimates (<%= it.estimates.length %>)</div>
+    <% if (it.estimates.length === 0) { %>
+    <p class="text-muted">No estimates yet.</p>
+    <% } else { %>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Status</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+          <% it.estimates.forEach(e => { %>
+          <tr>
+            <td><%= e.title %></td>
+            <td><status-badge status="<%= e.status %>"></status-badge></td>
+            <td class="text-muted"><%= it.fmtDate(e.createdAt) %></td>
+            <td><a href="/admin/estimates/<%= e.id %>" class="btn btn-xs btn-ghost">View</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Invoices (<%= it.invoices.length %>)</div>
+    <% if (it.invoices.length === 0) { %>
+    <p class="text-muted">No invoices yet.</p>
+    <% } else { %>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Status</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+          <% it.invoices.forEach(i => { %>
+          <tr>
+            <td><%= i.title %></td>
+            <td><status-badge status="<%= i.status %>"></status-badge></td>
+            <td class="text-muted"><%= it.fmtDate(i.createdAt) %></td>
+            <td><a href="/admin/invoices/<%= i.id %>" class="btn btn-xs btn-ghost">View</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</div>

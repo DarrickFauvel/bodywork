@@ -1,0 +1,62 @@
+<div class="page-header">
+  <div>
+    <div class="page-title">New Invoice</div>
+    <div class="page-subtitle"><a href="/admin/invoices">← Invoices</a></div>
+  </div>
+</div>
+<div class="page-body">
+  <div class="card" style="max-width:680px;">
+    <form method="POST" action="/admin/invoices">
+      <% if (it.fromEstimateId) { %>
+      <input type="hidden" name="fromEstimateId" value="<%= it.fromEstimateId %>" />
+      <% } %>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="customerId">Customer *</label>
+          <select id="customerId" name="customerId" required>
+            <option value="">— Select customer —</option>
+            <% it.customers.forEach(c => { %>
+            <option value="<%= c.id %>" <%= it.prefillCustomerId === c.id ? 'selected' : '' %>><%= c.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="taxRate">Tax Rate (%)</label>
+          <input type="number" id="taxRate" name="taxRate" step="0.1" min="0" max="100"
+            value="<%= ((it.settings?.defaultTaxRate ?? 0) * 100).toFixed(1) %>" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="title">Invoice Title *</label>
+        <input type="text" id="title" name="title" required value="<%= it.prefillTitle || '' %>"
+          placeholder="e.g. 2019 Honda Accord — Repair Invoice" />
+      </div>
+      <div class="form-group">
+        <label for="dueDate">Due Date</label>
+        <input type="date" id="dueDate" name="dueDate" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="vYear">Year</label>
+          <input type="text" id="vYear" name="vYear" value="<%= it.prefillVehicle?.year || '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="vMake">Make</label>
+          <input type="text" id="vMake" name="vMake" value="<%= it.prefillVehicle?.make || '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="vModel">Model</label>
+          <input type="text" id="vModel" name="vModel" value="<%= it.prefillVehicle?.model || '' %>" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes"></textarea>
+      </div>
+      <div class="btn-group mt-2">
+        <button type="submit" class="btn btn-primary">Create Invoice →</button>
+        <a href="/admin/invoices" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<% const isEdit = !!it.customer %>
+<div class="page-header">
+  <div>
+    <div class="page-title"><%= isEdit ? 'Edit Customer' : 'New Customer' %></div>
+    <div class="page-subtitle"><a href="/admin/customers">← Customers</a></div>
+  </div>
+</div>
+<div class="page-body">
+  <div class="card" style="max-width:600px;">
+    <form method="POST" action="<%= isEdit ? '/admin/customers/' + it.customer.id : '/admin/customers' %>">
+      <% if (isEdit) { %><input type="hidden" name="_method" value="PUT" /><% } %>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" required value="<%= it.customer?.name || '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" name="phone" value="<%= it.customer?.phone || '' %>" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<%= it.customer?.email || '' %>" />
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" value="<%= it.customer?.address || '' %>" />
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes"><%= it.customer?.notes || '' %></textarea>
+      </div>
+      <div class="btn-group mt-2">
+        <button type="submit" class="btn btn-primary">Save Customer</button>
+        <a href="/admin/customers<%= isEdit ? '/' + it.customer.id : '' %>" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+    <% if (isEdit) { %>
+    <hr class="divider" />
+    <form method="POST" action="/admin/customers/<%= it.customer.id %>/delete">
+      <button type="submit" class="btn btn-danger btn-sm"
+        onclick="return confirm('Delete this customer? This cannot be undone.')">Delete Customer</button>
+    </form>
+    <% } %>
+  </div>
+</div>

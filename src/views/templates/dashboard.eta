@@ -1,0 +1,75 @@
+<div class="page-header">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">Shop overview</div>
+  </div>
+  <div class="btn-group">
+    <a href="/admin/estimates/new" class="btn btn-primary">+ New Estimate</a>
+  </div>
+</div>
+<div class="page-body">
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Open Estimates</div>
+      <div class="kpi-value kpi-accent"><%= it.openEstimates %></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Outstanding Invoices</div>
+      <div class="kpi-value"><currency-amount value="<%= it.pendingInvoicesTotal %>"></currency-amount></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Paid This Month</div>
+      <div class="kpi-value" style="color:var(--success)"><currency-amount value="<%= it.paidThisMonth %>"></currency-amount></div>
+    </div>
+  </div>
+
+  <div class="dashboard-cols-wrap">
+    <div class="dashboard-cols">
+      <div class="card">
+        <div class="card-title">Recent Estimates</div>
+        <% if (it.recentEstimates.length === 0) { %>
+        <p class="text-muted">No estimates yet. <a href="/admin/estimates/new">Create one</a></p>
+        <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Customer</th><th>Title</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <% it.recentEstimates.forEach(e => { %>
+              <tr>
+                <td><%= e.customerName %></td>
+                <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= e.title %></td>
+                <td><status-badge status="<%= e.status %>"></status-badge></td>
+                <td><a href="/admin/estimates/<%= e.id %>" class="btn btn-xs btn-ghost">View</a></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recent Invoices</div>
+        <% if (it.recentInvoices.length === 0) { %>
+        <p class="text-muted">No invoices yet.</p>
+        <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Customer</th><th>Title</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <% it.recentInvoices.forEach(i => { %>
+              <tr>
+                <td><%= i.customerName %></td>
+                <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= i.title %></td>
+                <td><status-badge status="<%= i.status %>"></status-badge></td>
+                <td><a href="/admin/invoices/<%= i.id %>" class="btn btn-xs btn-ghost">View</a></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<% const TABS = ['all','draft','sent','paid'] %>
+<div class="page-header">
+  <div>
+    <div class="page-title">Invoices</div>
+    <div class="page-subtitle"><%= it.invoices.length %> shown</div>
+  </div>
+  <div class="btn-group">
+    <a href="/admin/invoices/new" class="btn btn-primary">+ New Invoice</a>
+  </div>
+</div>
+<div class="page-body">
+  <div class="filter-tabs">
+    <% TABS.forEach(t => { %>
+    <a href="/admin/invoices?tab=<%= t %>" class="filter-tab <%= it.activeTab === t ? 'active' : '' %>">
+      <%= t.charAt(0).toUpperCase() + t.slice(1) %>
+    </a>
+    <% }) %>
+  </div>
+
+  <% if (it.invoices.length === 0) { %>
+  <div class="empty-state">
+    <p>No invoices<%= it.activeTab !== 'all' ? ' with status "' + it.activeTab + '"' : '' %>.</p>
+    <a href="/admin/invoices/new" class="btn btn-primary">Create one</a>
+  </div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Due</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% it.invoices.forEach(i => { %>
+        <tr>
+          <td><a href="/admin/customers/<%= i.customerId %>"><%= i.customerName %></a></td>
+          <td><%= i.title %></td>
+          <td><status-badge status="<%= i.status %>"></status-badge></td>
+          <td class="text-muted"><%= i.dueDate ? it.fmtDate(i.dueDate) : '—' %></td>
+          <td class="text-muted"><%= it.fmtDate(i.createdAt) %></td>
+          <td><a href="/admin/invoices/<%= i.id %>" class="btn btn-xs btn-ghost">Open</a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
