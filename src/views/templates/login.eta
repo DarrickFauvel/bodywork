@@ -14,11 +14,7 @@
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-icon">
-        <img src="/public/logo-mark.svg" width="34" height="34" alt="" style="display:block;" />
-      </div>
-      <h1>Bodywork</h1>
-      <p>Autobody Estimate &amp; Invoice</p>
+      <img src="/public/images/logo.png" alt="Bodywork" style="width:180px;border-radius:10px;margin-bottom:1.25rem;" />
     </div>
     <% if (it.error) { %>
     <div class="error-msg"><%= it.error %></div>

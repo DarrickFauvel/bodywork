@@ -179,9 +179,8 @@
 <body>
 
 <nav class="land-nav">
-  <a href="/" class="land-logo">
-    <img src="/public/icon.svg" width="28" height="28" alt="" style="border-radius:6px;display:block;" />
-    Bodywork
+  <a href="/">
+    <img src="/public/images/logo.png" alt="Bodywork" height="40" style="display:block;border-radius:8px;" />
   </a>
   <div style="display:flex;gap:0.75rem;">
     <a href="/signup" class="btn btn-primary btn-sm">Get Started Free</a>

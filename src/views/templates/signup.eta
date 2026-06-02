@@ -14,11 +14,8 @@
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-icon">
-        <img src="/public/logo-mark.svg" width="34" height="34" alt="" style="display:block;" />
-      </div>
-      <h1>Bodywork</h1>
-      <p>Create your shop account</p>
+      <img src="/public/images/logo.png" alt="Bodywork" style="width:180px;border-radius:10px;margin-bottom:1.25rem;" />
+      <p style="margin-top:-0.5rem;margin-bottom:0;">Create your shop account</p>
     </div>
     <% if (it.error) { %>
     <div class="error-msg"><%= it.error %></div>
