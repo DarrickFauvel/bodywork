@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import { requireAdmin } from "../auth/middleware"
-import { libsql, query } from "../db/client"
+import { query } from "../db/client"
 import { render } from "../views/renderer"
 import { renderLayout } from "../views/layout-helper"
 import { fmtDate } from "../lib/html"
@@ -12,15 +12,17 @@ const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 app.get("/", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   const activeTab = c.req.query("tab") ?? "all"
   const [rows, monthCount] = await Promise.all([
-    libsql.execute(
+    query(
       `SELECT e.*, c.name AS customerName FROM estimates e
        JOIN customers c ON c.id = e.customerId
-       ORDER BY e.createdAt DESC`
+       WHERE e.ownerId = ? ORDER BY e.createdAt DESC`,
+      [userId]
     ),
-    countEstimatesThisMonth(),
+    countEstimatesThisMonth(userId),
   ])
   let estimates = rows.rows as unknown as EstimateWithCustomer[]
   if (activeTab !== "all") estimates = estimates.filter((e) => e.status === activeTab)
@@ -35,16 +37,17 @@ app.get("/", async (c) => {
 })
 
 app.get("/new", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   if (plan === "free") {
-    const count = await countEstimatesThisMonth()
+    const count = await countEstimatesThisMonth(userId)
     if (atEstimateLimit(count)) return c.redirect("/upgrade")
   }
-  const prefillCustomerId = c.req.query("customerId") ?? ""
   const [custRows, settingsRow] = await Promise.all([
-    libsql.execute("SELECT id, name FROM customers ORDER BY name ASC"),
-    libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+    query("SELECT id, name FROM customers WHERE ownerId = ? ORDER BY name ASC", [userId]),
+    query("SELECT * FROM settings WHERE id = ?", [userId]),
   ])
+  const prefillCustomerId = c.req.query("customerId") ?? ""
   return c.html(await renderLayout(c, {
     title: "New Estimate",
     activeNav: "estimates",
@@ -58,11 +61,12 @@ app.get("/new", async (c) => {
 
 app.get("/:id", async (c) => {
   const { id } = c.req.param()
+  const userId = c.get("user").id
   const [estRow, custRow, itemRows, settingsRow] = await Promise.all([
-    query("SELECT * FROM estimates WHERE id = ?", [id]),
-    query("SELECT c.* FROM customers c JOIN estimates e ON e.customerId = c.id WHERE e.id = ?", [id]),
+    query("SELECT * FROM estimates WHERE id = ? AND ownerId = ?", [id, userId]),
+    query("SELECT c.* FROM customers c JOIN estimates e ON e.customerId = c.id WHERE e.id = ? AND e.ownerId = ?", [id, userId]),
     query("SELECT * FROM line_items WHERE estimateId = ? ORDER BY sortOrder ASC, createdAt ASC", [id]),
-    libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+    query("SELECT * FROM settings WHERE id = ?", [userId]),
   ])
   if (!estRow.rows[0]) return c.notFound()
   const estimate = estRow.rows[0] as unknown as Estimate
@@ -87,9 +91,10 @@ app.get("/:id", async (c) => {
 })
 
 app.post("/", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   if (plan === "free") {
-    const count = await countEstimatesThisMonth()
+    const count = await countEstimatesThisMonth(userId)
     if (atEstimateLimit(count)) return c.redirect("/upgrade")
   }
   const body = await c.req.parseBody()
@@ -102,9 +107,9 @@ app.post("/", async (c) => {
     vin: String(body.vVin || ""), mileage: String(body.vMileage || ""),
   })
   await query(
-    `INSERT INTO estimates (id, customerId, status, title, vehicleInfo, notes, taxRate, createdAt, updatedAt)
-     VALUES (?, ?, 'draft', ?, ?, ?, ?, ?, ?)`,
-    [id, String(body.customerId), String(body.title), vehicle,
+    `INSERT INTO estimates (id, ownerId, customerId, status, title, vehicleInfo, notes, taxRate, createdAt, updatedAt)
+     VALUES (?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?)`,
+    [id, userId, String(body.customerId), String(body.title), vehicle,
      body.notes ? String(body.notes) : null, taxRate, now, now]
   )
   return c.redirect(`/admin/estimates/${id}`)
@@ -112,7 +117,8 @@ app.post("/", async (c) => {
 
 app.post("/:id/delete", async (c) => {
   const { id } = c.req.param()
-  await query("DELETE FROM estimates WHERE id = ?", [id])
+  const userId = c.get("user").id
+  await query("DELETE FROM estimates WHERE id = ? AND ownerId = ?", [id, userId])
   return c.redirect("/admin/estimates")
 })
 

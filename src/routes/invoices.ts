@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import { requireAdmin } from "../auth/middleware"
-import { libsql, query } from "../db/client"
+import { query } from "../db/client"
 import { render } from "../views/renderer"
 import { renderLayout } from "../views/layout-helper"
 import { fmtDate } from "../lib/html"
@@ -11,12 +11,14 @@ const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 app.get("/", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   const activeTab = c.req.query("tab") ?? "all"
-  const rows = await libsql.execute(
+  const rows = await query(
     `SELECT i.*, c.name AS customerName FROM invoices i
      JOIN customers c ON c.id = i.customerId
-     ORDER BY i.createdAt DESC`
+     WHERE i.ownerId = ? ORDER BY i.createdAt DESC`,
+    [userId]
   )
   let invoices = rows.rows as unknown as InvoiceWithCustomer[]
   if (activeTab !== "all") invoices = invoices.filter((i) => i.status === activeTab)
@@ -28,11 +30,12 @@ app.get("/", async (c) => {
 })
 
 app.get("/new", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   if (plan === "free") return c.redirect("/upgrade")
   const [custRows, settingsRow] = await Promise.all([
-    libsql.execute("SELECT id, name FROM customers ORDER BY name ASC"),
-    libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+    query("SELECT id, name FROM customers WHERE ownerId = ? ORDER BY name ASC", [userId]),
+    query("SELECT * FROM settings WHERE id = ?", [userId]),
   ])
   return c.html(await renderLayout(c, {
     title: "New Invoice",
@@ -47,11 +50,12 @@ app.get("/new", async (c) => {
 
 app.get("/:id", async (c) => {
   const { id } = c.req.param()
+  const userId = c.get("user").id
   const [invRow, custRow, itemRows, settingsRow] = await Promise.all([
-    query("SELECT * FROM invoices WHERE id = ?", [id]),
-    query("SELECT c.* FROM customers c JOIN invoices i ON i.customerId = c.id WHERE i.id = ?", [id]),
+    query("SELECT * FROM invoices WHERE id = ? AND ownerId = ?", [id, userId]),
+    query("SELECT c.* FROM customers c JOIN invoices i ON i.customerId = c.id WHERE i.id = ? AND i.ownerId = ?", [id, userId]),
     query("SELECT * FROM line_items WHERE invoiceId = ? ORDER BY sortOrder ASC, createdAt ASC", [id]),
-    libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+    query("SELECT * FROM settings WHERE id = ?", [userId]),
   ])
   if (!invRow.rows[0]) return c.notFound()
   const invoice = invRow.rows[0] as unknown as Invoice
@@ -76,7 +80,8 @@ app.get("/:id", async (c) => {
 })
 
 app.post("/", async (c) => {
-  const plan = c.get("plan") as string
+  const userId = c.get("user").id
+  const plan = c.get("plan")
   if (plan === "free") return c.redirect("/upgrade")
   const body = await c.req.parseBody()
   const id = crypto.randomUUID()
@@ -90,9 +95,9 @@ app.post("/", async (c) => {
     vin: String(body.vVin || ""), mileage: String(body.vMileage || ""),
   })
   await query(
-    `INSERT INTO invoices (id, customerId, estimateId, status, title, vehicleInfo, notes, taxRate, dueDate, createdAt, updatedAt)
-     VALUES (?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)`,
-    [id, String(body.customerId), body.fromEstimateId ? String(body.fromEstimateId) : null,
+    `INSERT INTO invoices (id, ownerId, customerId, estimateId, status, title, vehicleInfo, notes, taxRate, dueDate, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)`,
+    [id, userId, String(body.customerId), body.fromEstimateId ? String(body.fromEstimateId) : null,
      String(body.title), vehicle, body.notes ? String(body.notes) : null, taxRate, dueDate, now, now]
   )
   return c.redirect(`/admin/invoices/${id}`)
@@ -100,7 +105,8 @@ app.post("/", async (c) => {
 
 app.post("/:id/delete", async (c) => {
   const { id } = c.req.param()
-  await query("DELETE FROM invoices WHERE id = ?", [id])
+  const userId = c.get("user").id
+  await query("DELETE FROM invoices WHERE id = ? AND ownerId = ?", [id, userId])
   return c.redirect("/admin/invoices")
 })
 

@@ -16,6 +16,12 @@ app.get("/", async (c) => {
   return c.html(await render("./landing", {}))
 })
 
+app.get("/signup", async (c) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers }).catch(() => null)
+  if (session) return c.redirect("/admin/dashboard")
+  return c.html(await render("./signup", { error: null }))
+})
+
 app.get("/logout", async (c) => {
   await auth.api.signOut({ headers: c.req.raw.headers }).catch(() => null)
   const res = c.redirect("/login")

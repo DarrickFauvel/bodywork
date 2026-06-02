@@ -1,4 +1,4 @@
-import { query } from "./client"
+import { libsql, query } from "./client"
 import { auth } from "../auth/config"
 import { generateToken } from "../lib/tokens"
 
@@ -16,11 +16,21 @@ try {
   console.log("Admin user may already exist, skipping.")
 }
 
-// Settings
+// Promote to superadmin
+await libsql.execute(`UPDATE "user" SET role = 'superadmin' WHERE email = 'admin@bodywork.local'`)
+
+// Get admin userId
+const adminRow = await libsql.execute(
+  `SELECT id FROM "user" WHERE email = 'admin@bodywork.local' LIMIT 1`
+)
+const adminId = adminRow.rows[0]?.id as string
+if (!adminId) throw new Error("Admin user not found after signup")
+
+// Settings (id = userId, not 'singleton')
 await query(
   `INSERT OR REPLACE INTO settings (id, shopName, phone, email, address, defaultLaborRate, defaultTaxRate, updatedAt)
-   VALUES ('singleton', 'Apex Auto Body', '(555) 867-5309', 'info@apexautobody.com', '420 Industrial Blvd, Springfield, IL 62701', 95.0, 0.08, ?)`,
-  [now]
+   VALUES (?, 'Apex Auto Body', '(555) 867-5309', 'info@apexautobody.com', '420 Industrial Blvd, Springfield, IL 62701', 95.0, 0.08, ?)`,
+  [adminId, now]
 )
 
 // Customers
@@ -32,17 +42,17 @@ const customers = [
 
 for (const c of customers) {
   await query(
-    `INSERT OR IGNORE INTO customers (id, name, email, phone, address, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [c.id, c.name, c.email, c.phone, c.address, now, now]
+    `INSERT OR IGNORE INTO customers (id, ownerId, name, email, phone, address, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [c.id, adminId, c.name, c.email, c.phone, c.address, now, now]
   )
 }
 
 // Estimate 1 — draft with all 4 line item types
 const est1Id = crypto.randomUUID()
 await query(
-  `INSERT OR IGNORE INTO estimates (id, customerId, status, title, vehicleInfo, notes, taxRate, createdAt, updatedAt)
-   VALUES (?, ?, 'draft', ?, ?, ?, 0.08, ?, ?)`,
-  [est1Id, customers[0].id,
+  `INSERT OR IGNORE INTO estimates (id, ownerId, customerId, status, title, vehicleInfo, notes, taxRate, createdAt, updatedAt)
+   VALUES (?, ?, ?, 'draft', ?, ?, ?, 0.08, ?, ?)`,
+  [est1Id, adminId, customers[0].id,
    "2021 Toyota Camry — Front-End Collision",
    JSON.stringify({ year: "2021", make: "Toyota", model: "Camry", color: "Midnight Blue", vin: "4T1B11HK4MU012345", mileage: "34,200" }),
    "Customer reports front airbags deployed. Insurance claim #AUT-2024-88812.", now, now]
@@ -72,9 +82,10 @@ for (let i = 0; i < items1.length; i++) {
 const est2Id = crypto.randomUUID()
 const shareToken2 = generateToken()
 await query(
-  `INSERT OR IGNORE INTO estimates (id, customerId, status, title, vehicleInfo, taxRate, shareToken, sentAt, approvedAt, createdAt, updatedAt)
-   VALUES (?, ?, 'approved', ?, ?, 0.08, ?, ?, ?, ?, ?)`,
-  [est2Id, customers[1].id, "2018 Honda Civic — Passenger Door Damage",
+  `INSERT OR IGNORE INTO estimates (id, ownerId, customerId, status, title, vehicleInfo, taxRate, shareToken, sentAt, approvedAt, createdAt, updatedAt)
+   VALUES (?, ?, ?, 'approved', ?, ?, 0.08, ?, ?, ?, ?, ?)`,
+  [est2Id, adminId, customers[1].id,
+   "2018 Honda Civic — Passenger Door Damage",
    JSON.stringify({ year: "2018", make: "Honda", model: "Civic", color: "Silver", vin: "2HGFC2F59JH012345", mileage: "61,800" }),
    shareToken2, now - 86400000, now - 43200000, now - 86400000, now]
 )
@@ -93,9 +104,10 @@ await query(
 const inv1Id = crypto.randomUUID()
 const invToken1 = generateToken()
 await query(
-  `INSERT OR IGNORE INTO invoices (id, estimateId, customerId, status, title, vehicleInfo, taxRate, shareToken, dueDate, sentAt, createdAt, updatedAt)
-   VALUES (?, ?, ?, 'sent', ?, ?, 0.08, ?, ?, ?, ?, ?)`,
-  [inv1Id, est2Id, customers[1].id, "2018 Honda Civic — Passenger Door Damage",
+  `INSERT OR IGNORE INTO invoices (id, ownerId, estimateId, customerId, status, title, vehicleInfo, taxRate, shareToken, dueDate, sentAt, createdAt, updatedAt)
+   VALUES (?, ?, ?, ?, 'sent', ?, ?, 0.08, ?, ?, ?, ?, ?)`,
+  [inv1Id, adminId, est2Id, customers[1].id,
+   "2018 Honda Civic — Passenger Door Damage",
    JSON.stringify({ year: "2018", make: "Honda", model: "Civic", color: "Silver", vin: "2HGFC2F59JH012345", mileage: "61,800" }),
    invToken1, now + 14 * 86400000, now - 43200000, now - 43200000, now]
 )

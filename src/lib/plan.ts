@@ -9,12 +9,13 @@ export async function getUserPlan(userId: string): Promise<Plan> {
   return plan === "paid" ? "paid" : "free"
 }
 
-export async function countEstimatesThisMonth(): Promise<number> {
+export async function countEstimatesThisMonth(userId: string): Promise<number> {
   const startOfMonth = new Date()
   startOfMonth.setDate(1)
   startOfMonth.setHours(0, 0, 0, 0)
-  const row = await libsql.execute(
-    `SELECT COUNT(*) AS cnt FROM estimates WHERE createdAt >= ${startOfMonth.getTime()}`
+  const row = await query(
+    `SELECT COUNT(*) AS cnt FROM estimates WHERE ownerId = ? AND createdAt >= ?`,
+    [userId, startOfMonth.getTime()]
   )
   return Number((row.rows[0] as Record<string, unknown>)?.cnt ?? 0)
 }

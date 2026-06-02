@@ -1,0 +1,48 @@
+<div class="page-header">
+  <div>
+    <div class="page-title">Accounts</div>
+    <div class="page-subtitle"><%= it.accounts.length %> registered shop<%= it.accounts.length === 1 ? '' : 's' %></div>
+  </div>
+</div>
+<div class="page-body">
+  <% if (it.accounts.length === 0) { %>
+  <div class="empty-state"><p>No accounts yet.</p></div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Plan</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% it.accounts.forEach(function(a) { %>
+        <tr>
+          <td><%= a.name %></td>
+          <td class="text-muted"><%= a.email %></td>
+          <td>
+            <span class="badge <%= a.plan === 'paid' ? 'badge-approved' : 'badge-draft' %>">
+              <%= a.plan %>
+            </span>
+          </td>
+          <td class="text-muted"><%= a.role %></td>
+          <td class="text-muted"><%= it.fmtDate(a.createdAt) %></td>
+          <td>
+            <form method="POST" action="/superadmin/accounts/<%= a.id %>/toggle-plan">
+              <button type="submit" class="btn btn-xs btn-ghost">
+                <%= a.plan === 'paid' ? 'Downgrade' : 'Upgrade' %>
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
