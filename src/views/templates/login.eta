@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f97316" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Sign In — Bodywork</title>
   <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="manifest" href="/public/manifest.json" />
+  <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
 </head>
 <body>
 <div class="login-wrap">
@@ -20,7 +24,7 @@
     <form id="loginForm">
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email" placeholder="admin@shop.com" />
+        <input type="text" id="email" name="email" required autocomplete="email" placeholder="admin@bodywork.dev" />
       </div>
       <div class="form-group">
         <label for="password">Password</label>

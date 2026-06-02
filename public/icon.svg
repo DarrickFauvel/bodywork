@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a1a1a"/>
+  <rect width="512" height="512" rx="96" fill="#f97316" opacity="0.15"/>
+  <!-- Wrench body -->
+  <g fill="#f97316">
+    <path d="M340 96c-44 0-80 32-88 74l-124 124a80 80 0 1 0 90 90l124-124c42-8 74-44 74-88a88 88 0 0 0-8-36l-54 54-36-12-12-36 54-54A88 88 0 0 0 340 96z"/>
+    <circle cx="144" cy="368" r="28"/>
+  </g>
+</svg>
