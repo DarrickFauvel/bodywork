@@ -44,5 +44,7 @@
         <button type="submit" class="btn btn-primary">Save Settings</button>
       </div>
     </form>
+    <hr class="divider" />
+    <a href="/logout" class="btn btn-ghost btn-sm">&#8592; Sign out</a>
   </div>
 </div>

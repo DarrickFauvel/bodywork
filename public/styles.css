@@ -166,11 +166,11 @@ input, select, textarea, button { font: inherit; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 0.4rem 0.25rem;
+  gap: 5px;
+  padding: 0.5rem 0.5rem;
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -181,7 +181,7 @@ input, select, textarea, button { font: inherit; }
 .bottom-nav-item:hover  { color: var(--text); text-decoration: none; background: var(--surface-2); }
 .bottom-nav-item.active { color: var(--accent); border-top-color: var(--accent); }
 .bottom-nav-item:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-.bottom-nav-icon { font-size: 1.4rem; line-height: 1; }
+.bottom-nav-icon { font-size: 1.5rem; line-height: 1; }
 
 /* ── Main Content ───────────────────────────────────────────────────────── */
 .main-content {

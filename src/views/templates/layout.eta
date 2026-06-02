@@ -104,17 +104,6 @@
     <span class="bottom-nav-icon" aria-hidden="true">&#9881;</span>
     <span>Settings</span>
   </a>
-  <% if (it.isSuperAdmin) { %>
-  <a href="/superadmin/accounts" class="bottom-nav-item <%= it.activeNav === 'superadmin' ? 'active' : '' %>"
-    aria-current="<%= it.activeNav === 'superadmin' ? 'page' : 'false' %>">
-    <span class="bottom-nav-icon" aria-hidden="true">&#128101;</span>
-    <span>Accounts</span>
-  </a>
-  <% } %>
-  <a href="/logout" class="bottom-nav-item">
-    <span class="bottom-nav-icon" aria-hidden="true">&#8592;</span>
-    <span>Sign out</span>
-  </a>
 </nav>
 
 <div id="toast-anchor" aria-live="polite" aria-atomic="true">
