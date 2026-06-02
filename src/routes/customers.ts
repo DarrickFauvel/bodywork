@@ -2,16 +2,17 @@ import { Hono } from "hono"
 import { requireAdmin } from "../auth/middleware"
 import { libsql, query } from "../db/client"
 import { render } from "../views/renderer"
+import { renderLayout } from "../views/layout-helper"
 import { fmtDate } from "../lib/html"
-import type { Customer, EstimateWithCustomer, InvoiceWithCustomer } from "../types"
+import type { AppVariables, Customer, EstimateWithCustomer, InvoiceWithCustomer } from "../types"
 
-const app = new Hono()
+const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 app.get("/", async (c) => {
   const rows = await libsql.execute("SELECT * FROM customers ORDER BY name ASC")
   const customers = rows.rows as unknown as Customer[]
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "Customers",
     activeNav: "customers",
     content: await render("./customers/list", { customers, fmtDate }),
@@ -19,7 +20,7 @@ app.get("/", async (c) => {
 })
 
 app.get("/new", async (c) => {
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "New Customer",
     activeNav: "customers",
     content: await render("./customers/form", { customer: null }),
@@ -39,7 +40,7 @@ app.get("/:id", async (c) => {
   ])
   if (!custRow.rows[0]) return c.notFound()
   const customer = custRow.rows[0] as unknown as Customer
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: customer.name,
     activeNav: "customers",
     content: await render("./customers/detail", {
@@ -56,7 +57,7 @@ app.get("/:id/edit", async (c) => {
   const row = await query("SELECT * FROM customers WHERE id = ?", [id])
   if (!row.rows[0]) return c.notFound()
   const customer = row.rows[0] as unknown as Customer
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: `Edit ${customer.name}`,
     activeNav: "customers",
     content: await render("./customers/form", { customer }),

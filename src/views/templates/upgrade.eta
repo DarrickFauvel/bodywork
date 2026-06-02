@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f97316" />
+  <title>Upgrade to Pro — Bodywork</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
+  <style>
+    body { padding-bottom: 0; }
+    .upgrade-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+    .upgrade-card {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+    }
+    .upgrade-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .upgrade-card h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .upgrade-card .upgrade-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 1rem 0 0.25rem;
+    }
+    .upgrade-card .upgrade-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .upgrade-features {
+      list-style: none;
+      text-align: left;
+      margin: 1.5rem 0;
+      border-top: 1px solid var(--border);
+    }
+    .upgrade-features li {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      font-size: 0.95rem;
+    }
+    .check { color: var(--success); flex-shrink: 0; }
+    .upgrade-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+    .back-link {
+      margin-top: 1.5rem;
+      display: inline-block;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    <% if (it.plan === 'paid') { %>
+    .already-pro {
+      background: var(--surface-2);
+      border: 1px solid var(--success);
+      border-radius: var(--radius);
+      padding: 1rem;
+      color: var(--success);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    <% } %>
+  </style>
+</head>
+<body>
+<div class="upgrade-wrap">
+  <div class="upgrade-card">
+    <div class="upgrade-icon" aria-hidden="true">&#9881;</div>
+
+    <% if (it.plan === 'paid') { %>
+    <div class="already-pro">&#10003; You're already on Pro!</div>
+    <h1>You're all set</h1>
+    <p style="color:var(--text-muted);margin-top:0.5rem;">Your account has full Pro access. Enjoy unlimited estimates, invoicing, and everything else.</p>
+    <% } else { %>
+    <h1>Upgrade to Pro</h1>
+    <p style="color:var(--text-muted);">Unlock everything Bodywork has to offer.</p>
+    <div class="upgrade-price">$29 <span>/ month</span></div>
+    <ul class="upgrade-features">
+      <li><span class="check">&#10003;</span> Unlimited estimates</li>
+      <li><span class="check">&#10003;</span> Full invoicing suite</li>
+      <li><span class="check">&#10003;</span> Client history &amp; search</li>
+      <li><span class="check">&#10003;</span> Custom shop branding</li>
+      <li><span class="check">&#10003;</span> Shareable links for estimates &amp; invoices</li>
+    </ul>
+    <form method="POST" action="/billing/checkout">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" disabled>
+        Upgrade — Coming Soon
+      </button>
+    </form>
+    <p class="upgrade-note">Stripe billing coming soon. Check back shortly.</p>
+    <% } %>
+
+    <a href="/admin/dashboard" class="back-link">&#8592; Back to dashboard</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f97316" />
+  <title>Bodywork — Autobody Estimate &amp; Invoice Software</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
+  <style>
+    body { padding-bottom: 0; }
+
+    .land-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+    .land-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .land-logo .logo-icon { color: var(--accent); font-size: 1.5rem; }
+
+    .land-hero {
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .land-hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.25rem;
+    }
+    .land-hero h1 span { color: var(--accent); }
+    .land-hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .land-cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .land-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .land-feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .land-feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .land-feature h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .land-feature p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .land-pricing {
+      max-width: 720px;
+      margin: 0 auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .land-pricing h2 {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 2rem;
+    }
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 540px) {
+      .pricing-cards { grid-template-columns: 1fr; }
+    }
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent);
+      position: relative;
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.75rem;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .pricing-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .pricing-price {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    .pricing-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .pricing-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 1.75rem;
+    }
+    .pricing-features li {
+      font-size: 0.9rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--surface-2);
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    .pricing-features li:last-child { border-bottom: none; }
+    .check { color: var(--success); flex-shrink: 0; }
+    .cross { color: var(--text-muted); flex-shrink: 0; }
+
+    .land-footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="land-nav">
+  <a href="/" class="land-logo">
+    <span class="logo-icon" aria-hidden="true">&#9881;</span>
+    Bodywork
+  </a>
+  <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
+</nav>
+
+<section class="land-hero">
+  <h1>Estimates &amp; invoices built for <span>auto body shops</span></h1>
+  <p>Write professional estimates, convert them to invoices, and share them with customers — all from one simple app designed for the shop floor.</p>
+  <div class="land-cta-group">
+    <a href="/login" class="btn btn-primary">Get Started Free</a>
+    <a href="#pricing" class="btn btn-ghost">See Pricing</a>
+  </div>
+</section>
+
+<div class="land-features">
+  <div class="land-feature">
+    <span class="land-feature-icon" aria-hidden="true">&#128203;</span>
+    <h3>Fast Estimates</h3>
+    <p>Line items for labor, parts, paint, and sublet. Totals and tax calculated automatically.</p>
+  </div>
+  <div class="land-feature">
+    <span class="land-feature-icon" aria-hidden="true">&#128196;</span>
+    <h3>One-Click Invoicing</h3>
+    <p>Convert an approved estimate into an invoice in seconds — no re-entering data.</p>
+  </div>
+  <div class="land-feature">
+    <span class="land-feature-icon" aria-hidden="true">&#128279;</span>
+    <h3>Shareable Links</h3>
+    <p>Send customers a read-only link to their estimate or invoice. No login required on their end.</p>
+  </div>
+  <div class="land-feature">
+    <span class="land-feature-icon" aria-hidden="true">&#128241;</span>
+    <h3>Mobile-First</h3>
+    <p>Works great on your phone in the shop. Installable as a PWA for quick access.</p>
+  </div>
+</div>
+
+<section class="land-pricing" id="pricing">
+  <h2>Simple pricing</h2>
+  <div class="pricing-cards">
+    <div class="pricing-card">
+      <h3>Free</h3>
+      <div class="pricing-price">$0 <span>/ mo</span></div>
+      <p class="pricing-desc">Perfect for getting started.</p>
+      <ul class="pricing-features">
+        <li><span class="check">&#10003;</span> 3 estimates / month</li>
+        <li><span class="check">&#10003;</span> Customer management</li>
+        <li><span class="check">&#10003;</span> Shareable estimate links</li>
+        <li><span class="cross">&#215;</span> Invoicing</li>
+        <li><span class="cross">&#215;</span> Unlimited estimates</li>
+        <li><span class="cross">&#215;</span> Client history</li>
+      </ul>
+      <a href="/login" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free</a>
+    </div>
+    <div class="pricing-card featured">
+      <span class="pricing-badge">Most Popular</span>
+      <h3>Pro</h3>
+      <div class="pricing-price">$29 <span>/ mo</span></div>
+      <p class="pricing-desc">Everything you need to run your shop.</p>
+      <ul class="pricing-features">
+        <li><span class="check">&#10003;</span> Unlimited estimates</li>
+        <li><span class="check">&#10003;</span> Customer management</li>
+        <li><span class="check">&#10003;</span> Shareable links</li>
+        <li><span class="check">&#10003;</span> Full invoicing</li>
+        <li><span class="check">&#10003;</span> Client history &amp; search</li>
+        <li><span class="check">&#10003;</span> Custom shop branding</li>
+      </ul>
+      <a href="/upgrade" class="btn btn-primary" style="width:100%;justify-content:center;">Upgrade to Pro</a>
+    </div>
+  </div>
+</section>
+
+<footer class="land-footer">
+  &copy; <%= new Date().getFullYear() %> Bodywork. Built for the shop floor.
+</footer>
+
+</body>
+</html>

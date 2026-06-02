@@ -2,36 +2,50 @@ import { Hono } from "hono"
 import { requireAdmin } from "../auth/middleware"
 import { libsql, query } from "../db/client"
 import { render } from "../views/renderer"
+import { renderLayout } from "../views/layout-helper"
 import { fmtDate } from "../lib/html"
 import { lineItemRow, totalsRow } from "../views/partials"
-import type { Customer, Estimate, EstimateWithCustomer, LineItem, Settings } from "../types"
+import { countEstimatesThisMonth, atEstimateLimit, FREE_ESTIMATE_LIMIT } from "../lib/plan"
+import type { AppVariables, Customer, Estimate, EstimateWithCustomer, LineItem, Settings } from "../types"
 
-const app = new Hono()
+const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 app.get("/", async (c) => {
+  const plan = c.get("plan") as string
   const activeTab = c.req.query("tab") ?? "all"
-  const rows = await libsql.execute(
-    `SELECT e.*, c.name AS customerName FROM estimates e
-     JOIN customers c ON c.id = e.customerId
-     ORDER BY e.createdAt DESC`
-  )
+  const [rows, monthCount] = await Promise.all([
+    libsql.execute(
+      `SELECT e.*, c.name AS customerName FROM estimates e
+       JOIN customers c ON c.id = e.customerId
+       ORDER BY e.createdAt DESC`
+    ),
+    countEstimatesThisMonth(),
+  ])
   let estimates = rows.rows as unknown as EstimateWithCustomer[]
   if (activeTab !== "all") estimates = estimates.filter((e) => e.status === activeTab)
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "Estimates",
     activeNav: "estimates",
-    content: await render("./estimates/list", { estimates, activeTab, fmtDate }),
+    content: await render("./estimates/list", {
+      estimates, activeTab, fmtDate, plan, monthCount,
+      limit: FREE_ESTIMATE_LIMIT, atLimit: plan === "free" && atEstimateLimit(monthCount),
+    }),
   }))
 })
 
 app.get("/new", async (c) => {
+  const plan = c.get("plan") as string
+  if (plan === "free") {
+    const count = await countEstimatesThisMonth()
+    if (atEstimateLimit(count)) return c.redirect("/upgrade")
+  }
   const prefillCustomerId = c.req.query("customerId") ?? ""
   const [custRows, settingsRow] = await Promise.all([
     libsql.execute("SELECT id, name FROM customers ORDER BY name ASC"),
     libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
   ])
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "New Estimate",
     activeNav: "estimates",
     content: await render("./estimates/form", {
@@ -60,7 +74,7 @@ app.get("/:id", async (c) => {
     ? `${process.env.ORIGIN ?? "http://localhost:3000"}/share/${estimate.shareToken}`
     : null
 
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: estimate.title,
     activeNav: "estimates",
     content: await render("./estimates/detail", {
@@ -73,6 +87,11 @@ app.get("/:id", async (c) => {
 })
 
 app.post("/", async (c) => {
+  const plan = c.get("plan") as string
+  if (plan === "free") {
+    const count = await countEstimatesThisMonth()
+    if (atEstimateLimit(count)) return c.redirect("/upgrade")
+  }
   const body = await c.req.parseBody()
   const id = crypto.randomUUID()
   const now = Date.now()

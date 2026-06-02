@@ -53,6 +53,11 @@
       </a>
     </div>
     <div class="sidebar-footer">
+      <% if (it.plan === 'free') { %>
+      <a href="/upgrade" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:0.5rem;">
+        &#11014; Upgrade to Pro
+      </a>
+      <% } %>
       <button id="signOutBtnSidebar" class="btn btn-ghost btn-sm" style="width:100%;">
         &#8592; Sign out
       </button>

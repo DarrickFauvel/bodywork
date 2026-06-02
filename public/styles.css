@@ -193,6 +193,19 @@ input, select, textarea, button { font: inherit; }
   width: 100%;
 }
 
+/* ── Upgrade Banner ─────────────────────────────────────────────────────── */
+.upgrade-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  font-size: 0.9rem;
+}
+
 /* ── Page Header ────────────────────────────────────────────────────────── */
 .page-header {
   padding: 1.25rem 1rem 0.85rem;

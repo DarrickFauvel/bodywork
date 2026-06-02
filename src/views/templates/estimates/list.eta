@@ -1,11 +1,26 @@
 <% const TABS = ['all','draft','sent','approved','declined'] %>
+<% if (it.plan === 'free') { %>
+<div class="upgrade-banner" role="status">
+  <span>
+    <strong><%= it.monthCount %> / <%= it.limit %></strong> estimates used this month.
+    <% if (it.atLimit) { %>
+    <strong>Limit reached.</strong>
+    <% } %>
+  </span>
+  <a href="/upgrade" class="btn btn-primary btn-sm">Upgrade to Pro for unlimited</a>
+</div>
+<% } %>
 <div class="page-header">
   <div>
     <div class="page-title">Estimates</div>
     <div class="page-subtitle"><%= it.estimates.length %> shown</div>
   </div>
   <div class="btn-group">
+    <% if (it.atLimit) { %>
+    <a href="/upgrade" class="btn btn-primary">+ New Estimate</a>
+    <% } else { %>
     <a href="/admin/estimates/new" class="btn btn-primary">+ New Estimate</a>
+    <% } %>
   </div>
 </div>
 <div class="page-body">
