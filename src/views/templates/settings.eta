@@ -45,6 +45,11 @@
       </div>
     </form>
     <hr class="divider" />
-    <a href="/logout" class="btn btn-ghost btn-sm">&#8592; Sign out</a>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+      <% if (it.isSuperAdmin) { %>
+      <a href="/superadmin/accounts" class="btn btn-ghost btn-sm">&#128101; Accounts</a>
+      <% } %>
+      <a href="/logout" class="btn btn-ghost btn-sm">&#8592; Sign out</a>
+    </div>
   </div>
 </div>
