@@ -58,9 +58,9 @@
         &#11014; Upgrade to Pro
       </a>
       <% } %>
-      <button id="signOutBtnSidebar" class="btn btn-ghost btn-sm" style="width:100%;">
+      <a href="/logout" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;">
         &#8592; Sign out
-      </button>
+      </a>
     </div>
   </nav>
 
@@ -97,6 +97,10 @@
     <span class="bottom-nav-icon" aria-hidden="true">&#9881;</span>
     <span>Settings</span>
   </a>
+  <a href="/logout" class="bottom-nav-item">
+    <span class="bottom-nav-icon" aria-hidden="true">&#8592;</span>
+    <span>Sign out</span>
+  </a>
 </nav>
 
 <div id="toast-anchor" aria-live="polite" aria-atomic="true">
@@ -104,14 +108,6 @@
 </div>
 
 <script>
-  // Sign out handler
-  document.querySelectorAll('#signOutBtnSidebar').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      await fetch('/auth/sign-out', { method: 'POST' })
-      window.location.href = '/login'
-    })
-  })
-
   // Register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/public/sw.js').catch(() => {})

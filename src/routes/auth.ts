@@ -16,6 +16,13 @@ app.get("/", async (c) => {
   return c.html(await render("./landing", {}))
 })
 
+app.get("/logout", async (c) => {
+  await auth.api.signOut({ headers: c.req.raw.headers }).catch(() => null)
+  const res = c.redirect("/login")
+  res.headers.append("Set-Cookie", "better-auth.session_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax")
+  return res
+})
+
 // Mount Better Auth handler for all /auth/* routes
 app.all("/auth/*", async (c) => {
   return auth.handler(c.req.raw)
