@@ -85,7 +85,9 @@
 <body>
 <div class="upgrade-wrap">
   <div class="upgrade-card">
-    <div class="upgrade-icon" aria-hidden="true">&#9881;</div>
+    <div class="upgrade-icon" aria-hidden="true">
+      <img src="/public/icon.svg" width="56" height="56" alt="" style="border-radius:12px;display:block;margin:0 auto;" />
+    </div>
 
     <% if (it.plan === 'paid') { %>
     <div class="already-pro">&#10003; You're already on Pro!</div>

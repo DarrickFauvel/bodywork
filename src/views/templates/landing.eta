@@ -30,7 +30,7 @@
       color: var(--text);
       text-decoration: none;
     }
-    .land-logo .logo-icon { color: var(--accent); font-size: 1.5rem; }
+    .land-logo img { flex-shrink: 0; }
 
     .land-hero {
       text-align: center;
@@ -180,7 +180,7 @@
 
 <nav class="land-nav">
   <a href="/" class="land-logo">
-    <span class="logo-icon" aria-hidden="true">&#9881;</span>
+    <img src="/public/icon.svg" width="28" height="28" alt="" style="border-radius:6px;display:block;" />
     Bodywork
   </a>
   <div style="display:flex;gap:0.75rem;">

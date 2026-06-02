@@ -14,7 +14,9 @@
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-icon">&#9881;</div>
+      <div class="logo-icon">
+        <img src="/public/logo-mark.svg" width="34" height="34" alt="" style="display:block;" />
+      </div>
       <h1>Bodywork</h1>
       <p>Autobody Estimate &amp; Invoice</p>
     </div>
