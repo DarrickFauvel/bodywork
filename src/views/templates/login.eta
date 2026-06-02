@@ -14,8 +14,7 @@
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-logo">
-      <img src="/public/icon.svg" width="56" height="56" alt="" style="border-radius:12px;margin-bottom:0.85rem;" />
-      <div class="wordmark" style="font-size:1.75rem;display:block;">
+      <div class="wordmark" style="font-size:1.75rem;display:block;margin-bottom:0.5rem;">
         <span class="wordmark-body">BODY</span><span class="wordmark-work">WORK</span>
       </div>
       <p>Autobody Estimate &amp; Invoice</p>
