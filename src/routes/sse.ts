@@ -5,9 +5,9 @@ import { query } from "../db/client"
 import { patchElements, patchSignals } from "../lib/html"
 import { lineItemRow, totalsRow } from "../views/partials"
 import { generateToken } from "../lib/tokens"
-import type { Estimate, Invoice, LineItem, Settings } from "../types"
+import type { AppVariables, Estimate, Invoice, LineItem, Settings } from "../types"
 
-const app = new Hono()
+const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 async function getItems(estimateId: string | null, invoiceId: string | null): Promise<LineItem[]> {
@@ -20,9 +20,19 @@ async function getItems(estimateId: string | null, invoiceId: string | null): Pr
   return rows.rows as unknown as LineItem[]
 }
 
-async function getSettings(): Promise<Settings> {
-  const row = await query("SELECT * FROM settings WHERE id = 'singleton'")
+async function getSettings(userId: string): Promise<Settings> {
+  const row = await query("SELECT * FROM settings WHERE id = ?", [userId])
   return (row.rows[0] ?? { defaultLaborRate: 95, defaultTaxRate: 0 }) as unknown as Settings
+}
+
+async function assertOwnsEstimate(id: string, userId: string): Promise<Estimate | null> {
+  const row = await query("SELECT * FROM estimates WHERE id = ? AND ownerId = ?", [id, userId])
+  return row.rows[0] ? (row.rows[0] as unknown as Estimate) : null
+}
+
+async function assertOwnsInvoice(id: string, userId: string): Promise<Invoice | null> {
+  const row = await query("SELECT * FROM invoices WHERE id = ? AND ownerId = ?", [id, userId])
+  return row.rows[0] ? (row.rows[0] as unknown as Invoice) : null
 }
 
 // Datastar v1.0.1 lowercases all signal names before sending, so normalize keys here
@@ -38,6 +48,7 @@ async function parseSignals(c: { req: { json: <T>() => Promise<T>; parseBody: ()
 // ── Estimate: Save Header ──────────────────────────────────────────────────
 app.post("/estimates/:id/save", async (c) => {
   const { id } = c.req.param()
+  if (!await assertOwnsEstimate(id, c.get("user").id)) return c.json({ error: "Not found" }, 404)
   const data = await parseSignals(c)
   const taxRate = parseFloat(data.taxrate ?? "0") / 100
   const vehicle = JSON.stringify({
@@ -56,6 +67,7 @@ app.post("/estimates/:id/save", async (c) => {
 // ── Estimate: Status Transition ────────────────────────────────────────────
 app.post("/estimates/:id/status", async (c) => {
   const { id } = c.req.param()
+  if (!await assertOwnsEstimate(id, c.get("user").id)) return c.json({ error: "Not found" }, 404)
   const action = c.req.query("action")
   const now = Date.now()
 
@@ -83,18 +95,18 @@ app.post("/estimates/:id/status", async (c) => {
 // ── Estimate: Convert to Invoice ───────────────────────────────────────────
 app.post("/estimates/:id/convert", async (c) => {
   const { id } = c.req.param()
-  const estRow = await query("SELECT * FROM estimates WHERE id = ?", [id])
-  if (!estRow.rows[0]) return c.json({ error: "Not found" }, 404)
-  const est = estRow.rows[0] as unknown as Estimate
+  const userId = c.get("user").id
+  const est = await assertOwnsEstimate(id, userId)
+  if (!est) return c.json({ error: "Not found" }, 404)
 
   const invoiceId = crypto.randomUUID()
   const token = generateToken()
   const now = Date.now()
 
   await query(
-    `INSERT INTO invoices (id, estimateId, customerId, status, title, vehicleInfo, notes, taxRate, shareToken, createdAt, updatedAt)
-     VALUES (?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)`,
-    [invoiceId, id, est.customerId, est.title, est.vehicleInfo, est.notes, est.taxRate, token, now, now]
+    `INSERT INTO invoices (id, ownerId, estimateId, customerId, status, title, vehicleInfo, notes, taxRate, shareToken, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)`,
+    [invoiceId, userId, id, est.customerId, est.title, est.vehicleInfo, est.notes, est.taxRate, token, now, now]
   )
 
   const items = await getItems(id, null)
@@ -119,8 +131,10 @@ app.post("/estimates/:id/convert", async (c) => {
 // ── Estimate: Add Line Item ────────────────────────────────────────────────
 app.post("/estimates/:id/line-items", async (c) => {
   const { id } = c.req.param()
+  const userId = c.get("user").id
+  if (!await assertOwnsEstimate(id, userId)) return c.json({ error: "Not found" }, 404)
   const data = await parseSignals(c)
-  const settings = await getSettings()
+  const settings = await getSettings(userId)
   const itemId = crypto.randomUUID()
   const now = Date.now()
   const type = data.newtype || "labor"
@@ -152,6 +166,7 @@ app.post("/estimates/:id/line-items", async (c) => {
 // ── Invoice: Save Header ───────────────────────────────────────────────────
 app.post("/invoices/:id/save", async (c) => {
   const { id } = c.req.param()
+  if (!await assertOwnsInvoice(id, c.get("user").id)) return c.json({ error: "Not found" }, 404)
   const data = await parseSignals(c)
   const taxRate = parseFloat(data.taxrate ?? "0") / 100
   const dueDate = data.duedate ? new Date(data.duedate).getTime() : null
@@ -171,6 +186,7 @@ app.post("/invoices/:id/save", async (c) => {
 // ── Invoice: Status Transition ─────────────────────────────────────────────
 app.post("/invoices/:id/status", async (c) => {
   const { id } = c.req.param()
+  if (!await assertOwnsInvoice(id, c.get("user").id)) return c.json({ error: "Not found" }, 404)
   const action = c.req.query("action")
   const now = Date.now()
 
@@ -196,8 +212,10 @@ app.post("/invoices/:id/status", async (c) => {
 // ── Invoice: Add Line Item ─────────────────────────────────────────────────
 app.post("/invoices/:id/line-items", async (c) => {
   const { id } = c.req.param()
+  const userId = c.get("user").id
+  if (!await assertOwnsInvoice(id, userId)) return c.json({ error: "Not found" }, 404)
   const data = await parseSignals(c)
-  const settings = await getSettings()
+  const settings = await getSettings(userId)
   const itemId = crypto.randomUUID()
   const now = Date.now()
   const type = data.newtype || "labor"

@@ -8,5 +8,6 @@ export async function renderLayout(c: Context<{ Variables: AppVariables }>, opts
   content: string
 }) {
   const plan = (c.get("plan") as string | undefined) ?? "free"
-  return render("./layout", { ...opts, plan })
+  const isSuperAdmin = (c.get("isSuperAdmin") as boolean | undefined) ?? false
+  return render("./layout", { ...opts, plan, isSuperAdmin })
 }

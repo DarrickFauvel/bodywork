@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f97316" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Sign In — Bodywork</title>
+  <title>Create Account — Bodywork</title>
   <link rel="stylesheet" href="/public/styles.css" />
   <link rel="manifest" href="/public/manifest.json" />
   <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
@@ -16,48 +16,54 @@
     <div class="login-logo">
       <div class="logo-icon">&#9881;</div>
       <h1>Bodywork</h1>
-      <p>Autobody Estimate &amp; Invoice</p>
+      <p>Create your shop account</p>
     </div>
     <% if (it.error) { %>
     <div class="error-msg"><%= it.error %></div>
     <% } %>
-    <form id="loginForm">
+    <form id="signupForm">
+      <div class="form-group">
+        <label for="name">Shop / Your Name</label>
+        <input type="text" id="name" name="name" required autocomplete="name" placeholder="Apex Auto Body" />
+      </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="text" id="email" name="email" required autocomplete="email" placeholder="admin@bodywork.dev" />
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@yourshop.com" />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+        <input type="password" id="password" name="password" required autocomplete="new-password"
+          placeholder="••••••••" minlength="8" />
       </div>
-      <div id="loginError" class="error-msg" style="display:none;"></div>
+      <div id="signupError" class="error-msg" style="display:none;"></div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">
-        Sign In
+        Create Free Account
       </button>
     </form>
     <p style="text-align:center;margin-top:1rem;font-size:0.875rem;color:var(--text-muted);">
-      Don't have an account? <a href="/signup">Create one free</a>
+      Already have an account? <a href="/login">Sign in</a>
     </p>
   </div>
 </div>
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
   e.preventDefault()
-  const email = document.getElementById('email').value
+  const name     = document.getElementById('name').value
+  const email    = document.getElementById('email').value
   const password = document.getElementById('password').value
-  const errEl = document.getElementById('loginError')
+  const errEl    = document.getElementById('signupError')
   errEl.style.display = 'none'
   try {
-    const res = await fetch('/auth/sign-in/email', {
+    const res = await fetch('/auth/sign-up/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, callbackURL: '/admin/dashboard' }),
+      body: JSON.stringify({ name, email, password, callbackURL: '/admin/dashboard' }),
     })
     const data = await res.json().catch(() => ({}))
     if (res.ok) {
       window.location.href = '/admin/dashboard'
     } else {
-      errEl.textContent = data?.message || data?.error?.message || 'Invalid email or password.'
+      errEl.textContent = data?.message || data?.error?.message || 'Could not create account. Please try again.'
       errEl.style.display = ''
     }
   } catch {

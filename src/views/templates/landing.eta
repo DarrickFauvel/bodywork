@@ -183,15 +183,17 @@
     <span class="logo-icon" aria-hidden="true">&#9881;</span>
     Bodywork
   </a>
-  <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
-  <a href="/logout" class="btn btn-ghost btn-sm">Sign Out</a>
+  <div style="display:flex;gap:0.75rem;">
+    <a href="/signup" class="btn btn-primary btn-sm">Get Started Free</a>
+    <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
+  </div>
 </nav>
 
 <section class="land-hero">
   <h1>Estimates &amp; invoices built for <span>auto body shops</span></h1>
   <p>Write professional estimates, convert them to invoices, and share them with customers — all from one simple app designed for the shop floor.</p>
   <div class="land-cta-group">
-    <a href="/login" class="btn btn-primary">Get Started Free</a>
+    <a href="/signup" class="btn btn-primary">Get Started Free</a>
     <a href="#pricing" class="btn btn-ghost">See Pricing</a>
   </div>
 </section>
@@ -234,7 +236,7 @@
         <li><span class="cross">&#215;</span> Unlimited estimates</li>
         <li><span class="cross">&#215;</span> Client history</li>
       </ul>
-      <a href="/login" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free</a>
+      <a href="/signup" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free</a>
     </div>
     <div class="pricing-card featured">
       <span class="pricing-badge">Most Popular</span>

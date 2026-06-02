@@ -3,6 +3,7 @@ import type { User } from "better-auth"
 export type AppVariables = {
   user: User
   plan: string
+  isSuperAdmin: boolean
 }
 
 export type EstimateStatus = "draft" | "sent" | "approved" | "declined"
@@ -31,6 +32,7 @@ export interface Settings {
 
 export interface Customer {
   id: string
+  ownerId: string
   name: string
   email: string | null
   phone: string | null
@@ -42,6 +44,7 @@ export interface Customer {
 
 export interface Estimate {
   id: string
+  ownerId: string
   customerId: string
   status: EstimateStatus
   title: string
@@ -58,6 +61,7 @@ export interface Estimate {
 
 export interface Invoice {
   id: string
+  ownerId: string
   estimateId: string | null
   customerId: string
   status: InvoiceStatus

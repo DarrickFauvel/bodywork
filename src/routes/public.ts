@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { libsql, query } from "../db/client"
+import { query } from "../db/client"
 import { render } from "../views/renderer"
 import { fmtDate } from "../lib/html"
 import { lineItemRowReadOnly, totalsRow } from "../views/partials"
@@ -16,7 +16,7 @@ app.get("/share/:token", async (c) => {
     const [custRow, itemRows, settingsRow] = await Promise.all([
       query("SELECT * FROM customers WHERE id = ?", [estimate.customerId]),
       query("SELECT * FROM line_items WHERE estimateId = ? ORDER BY sortOrder ASC, createdAt ASC", [estimate.id]),
-      libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+      query("SELECT * FROM settings WHERE id = ?", [estimate.ownerId]),
     ])
     const customer = custRow.rows[0] as unknown as Customer
     const items = itemRows.rows as unknown as LineItem[]
@@ -35,7 +35,7 @@ app.get("/share/:token", async (c) => {
     const [custRow, itemRows, settingsRow] = await Promise.all([
       query("SELECT * FROM customers WHERE id = ?", [invoice.customerId]),
       query("SELECT * FROM line_items WHERE invoiceId = ? ORDER BY sortOrder ASC, createdAt ASC", [invoice.id]),
-      libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
+      query("SELECT * FROM settings WHERE id = ?", [invoice.ownerId]),
     ])
     const customer = custRow.rows[0] as unknown as Customer
     const items = itemRows.rows as unknown as LineItem[]
