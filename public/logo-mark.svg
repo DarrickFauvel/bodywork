@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="20" fill="#f97316"/>
   <!-- Cabin -->
   <path d="M18 36 L31 10 L69 10 L82 36 Z" fill="white"/>
   <!-- Window -->

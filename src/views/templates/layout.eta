@@ -24,7 +24,9 @@
   <nav class="sidebar" aria-label="Main navigation">
     <div class="sidebar-logo">
       <a href="/admin/dashboard">
-        <span class="logo-icon" aria-hidden="true">&#9881;</span>
+        <span class="logo-icon" aria-hidden="true">
+          <img src="/public/logo-mark.svg" width="22" height="22" alt="" style="display:block;" />
+        </span>
         Bodywork
       </a>
     </div>
