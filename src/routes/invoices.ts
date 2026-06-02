@@ -2,14 +2,16 @@ import { Hono } from "hono"
 import { requireAdmin } from "../auth/middleware"
 import { libsql, query } from "../db/client"
 import { render } from "../views/renderer"
+import { renderLayout } from "../views/layout-helper"
 import { fmtDate } from "../lib/html"
 import { lineItemRow, totalsRow } from "../views/partials"
-import type { Customer, Invoice, InvoiceWithCustomer, LineItem, Settings } from "../types"
+import type { AppVariables, Customer, Invoice, InvoiceWithCustomer, LineItem, Settings } from "../types"
 
-const app = new Hono()
+const app = new Hono<{ Variables: AppVariables }>()
 app.use("*", requireAdmin)
 
 app.get("/", async (c) => {
+  const plan = c.get("plan") as string
   const activeTab = c.req.query("tab") ?? "all"
   const rows = await libsql.execute(
     `SELECT i.*, c.name AS customerName FROM invoices i
@@ -18,19 +20,21 @@ app.get("/", async (c) => {
   )
   let invoices = rows.rows as unknown as InvoiceWithCustomer[]
   if (activeTab !== "all") invoices = invoices.filter((i) => i.status === activeTab)
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "Invoices",
     activeNav: "invoices",
-    content: await render("./invoices/list", { invoices, activeTab, fmtDate }),
+    content: await render("./invoices/list", { invoices, activeTab, fmtDate, plan }),
   }))
 })
 
 app.get("/new", async (c) => {
+  const plan = c.get("plan") as string
+  if (plan === "free") return c.redirect("/upgrade")
   const [custRows, settingsRow] = await Promise.all([
     libsql.execute("SELECT id, name FROM customers ORDER BY name ASC"),
     libsql.execute("SELECT * FROM settings WHERE id = 'singleton'"),
   ])
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "New Invoice",
     activeNav: "invoices",
     content: await render("./invoices/form", {
@@ -59,7 +63,7 @@ app.get("/:id", async (c) => {
     ? `${process.env.ORIGIN ?? "http://localhost:3000"}/share/${invoice.shareToken}`
     : null
 
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: invoice.title,
     activeNav: "invoices",
     content: await render("./invoices/detail", {
@@ -72,6 +76,8 @@ app.get("/:id", async (c) => {
 })
 
 app.post("/", async (c) => {
+  const plan = c.get("plan") as string
+  if (plan === "free") return c.redirect("/upgrade")
   const body = await c.req.parseBody()
   const id = crypto.randomUUID()
   const now = Date.now()

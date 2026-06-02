@@ -1,3 +1,10 @@
+import type { User } from "better-auth"
+
+export type AppVariables = {
+  user: User
+  plan: string
+}
+
 export type EstimateStatus = "draft" | "sent" | "approved" | "declined"
 export type InvoiceStatus = "draft" | "sent" | "paid"
 export type LineItemType = "labor" | "parts" | "paint" | "sublet"

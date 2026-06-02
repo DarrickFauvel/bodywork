@@ -1,11 +1,21 @@
 <% const TABS = ['all','draft','sent','paid'] %>
+<% if (it.plan === 'free') { %>
+<div class="upgrade-banner" role="status">
+  <span>Invoicing is a <strong>Pro</strong> feature.</span>
+  <a href="/upgrade" class="btn btn-primary btn-sm">Upgrade to Pro — $29/mo</a>
+</div>
+<% } %>
 <div class="page-header">
   <div>
     <div class="page-title">Invoices</div>
     <div class="page-subtitle"><%= it.invoices.length %> shown</div>
   </div>
   <div class="btn-group">
+    <% if (it.plan === 'free') { %>
+    <a href="/upgrade" class="btn btn-primary">+ New Invoice</a>
+    <% } else { %>
     <a href="/admin/invoices/new" class="btn btn-primary">+ New Invoice</a>
+    <% } %>
   </div>
 </div>
 <div class="page-body">

@@ -3,6 +3,7 @@ import { serveStatic } from "hono/bun"
 import { requireAdmin } from "./auth/middleware"
 import { libsql, query } from "./db/client"
 import { render } from "./views/renderer"
+import { renderLayout } from "./views/layout-helper"
 import { fmtDate } from "./lib/html"
 import { fmt } from "./lib/totals"
 import { authRoutes } from "./routes/auth"
@@ -11,9 +12,10 @@ import { estimateRoutes } from "./routes/estimates"
 import { invoiceRoutes } from "./routes/invoices"
 import { sseRoutes } from "./routes/sse"
 import { publicRoutes } from "./routes/public"
-import type { Settings } from "./types"
+import { billingRoutes } from "./routes/billing"
+import type { AppVariables, Settings } from "./types"
 
-const app = new Hono()
+const app = new Hono<{ Variables: AppVariables }>()
 
 // Static files
 app.use("/public/*", serveStatic({ root: "./" }))
@@ -56,7 +58,7 @@ app.get("/admin/dashboard", requireAdmin, async (c) => {
       ORDER BY i.createdAt DESC LIMIT 5`),
   ])
 
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "Dashboard",
     activeNav: "dashboard",
     content: await render("./dashboard", {
@@ -75,7 +77,7 @@ app.get("/admin/dashboard", requireAdmin, async (c) => {
 app.get("/admin/settings", requireAdmin, async (c) => {
   const row = await libsql.execute("SELECT * FROM settings WHERE id = 'singleton'")
   const settings = (row.rows[0] ?? {}) as unknown as Settings
-  return c.html(await render("./layout", {
+  return c.html(await renderLayout(c, {
     title: "Settings",
     activeNav: "settings",
     content: await render("./settings", { settings }),
@@ -104,5 +106,6 @@ app.route("/admin/customers", customerRoutes)
 app.route("/admin/estimates", estimateRoutes)
 app.route("/admin/invoices", invoiceRoutes)
 app.route("/sse", sseRoutes)
+app.route("/", billingRoutes)
 
 export { app }

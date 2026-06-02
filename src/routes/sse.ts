@@ -25,17 +25,24 @@ async function getSettings(): Promise<Settings> {
   return (row.rows[0] ?? { defaultLaborRate: 95, defaultTaxRate: 0 }) as unknown as Settings
 }
 
+// Datastar v1.0.1 lowercases all signal names before sending, so normalize keys here
+async function parseSignals(c: { req: { json: <T>() => Promise<T>; parseBody: () => Promise<Record<string, unknown>> } }): Promise<Record<string, string>> {
+  const raw = await (c.req.json<Record<string, unknown>>() as Promise<Record<string, unknown>>).catch(async () => {
+    return c.req.parseBody() as Promise<Record<string, unknown>>
+  })
+  return Object.fromEntries(
+    Object.entries(raw as Record<string, unknown>).map(([k, v]) => [k.toLowerCase(), String(v ?? "")])
+  )
+}
+
 // ── Estimate: Save Header ──────────────────────────────────────────────────
 app.post("/estimates/:id/save", async (c) => {
   const { id } = c.req.param()
-  const data = await c.req.json<Record<string, string>>().catch(async () => {
-    const b = await c.req.parseBody()
-    return Object.fromEntries(Object.entries(b).map(([k, v]) => [k, String(v)]))
-  })
-  const taxRate = parseFloat(data.taxRate ?? "0") / 100
+  const data = await parseSignals(c)
+  const taxRate = parseFloat(data.taxrate ?? "0") / 100
   const vehicle = JSON.stringify({
-    year: data.vYear || "", make: data.vMake || "", model: data.vModel || "",
-    color: data.vColor || "", vin: data.vVin || "", mileage: data.vMileage || "",
+    year: data.vyear || "", make: data.vmake || "", model: data.vmodel || "",
+    color: data.vcolor || "", vin: data.vvin || "", mileage: data.vmileage || "",
   })
   await query(
     `UPDATE estimates SET title=?, vehicleInfo=?, notes=?, taxRate=?, updatedAt=? WHERE id=?`,
@@ -112,25 +119,22 @@ app.post("/estimates/:id/convert", async (c) => {
 // ── Estimate: Add Line Item ────────────────────────────────────────────────
 app.post("/estimates/:id/line-items", async (c) => {
   const { id } = c.req.param()
-  const data = await c.req.json<Record<string, string>>().catch(async () => {
-    const b = await c.req.parseBody()
-    return Object.fromEntries(Object.entries(b).map(([k, v]) => [k, String(v)]))
-  })
+  const data = await parseSignals(c)
   const settings = await getSettings()
   const itemId = crypto.randomUUID()
   const now = Date.now()
-  const type = data.newType ?? "labor"
+  const type = data.newtype || "labor"
 
   await query(
     `INSERT INTO line_items (id, estimateId, type, sortOrder, description, laborHours, laborRate, partNumber, quantity, unitPrice, flatPrice, createdAt, updatedAt)
      VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [itemId, id, type, data.newDesc || "—",
-     type === "labor" ? parseFloat(data.newHours ?? "0") : null,
-     type === "labor" ? parseFloat(data.newRate ?? String(settings.defaultLaborRate)) : null,
-     (type === "parts" || type === "paint") ? (data.newPartNum || null) : null,
-     (type === "parts" || type === "paint") ? parseFloat(data.newQty ?? "1") : null,
-     (type === "parts" || type === "paint") ? parseFloat(data.newUnitPrice ?? "0") : null,
-     type === "sublet" ? parseFloat(data.newFlat ?? "0") : null,
+    [itemId, id, type, data.newdesc || "—",
+     type === "labor" ? parseFloat(data.newhours || "0") : null,
+     type === "labor" ? parseFloat(data.newrate || String(settings.defaultLaborRate)) : null,
+     (type === "parts" || type === "paint") ? (data.newpartnum || null) : null,
+     (type === "parts" || type === "paint") ? parseFloat(data.newqty || "1") : null,
+     (type === "parts" || type === "paint") ? parseFloat(data.newunitprice || "0") : null,
+     type === "sublet" ? parseFloat(data.newflat || "0") : null,
      now, now]
   )
 
@@ -148,15 +152,12 @@ app.post("/estimates/:id/line-items", async (c) => {
 // ── Invoice: Save Header ───────────────────────────────────────────────────
 app.post("/invoices/:id/save", async (c) => {
   const { id } = c.req.param()
-  const data = await c.req.json<Record<string, string>>().catch(async () => {
-    const b = await c.req.parseBody()
-    return Object.fromEntries(Object.entries(b).map(([k, v]) => [k, String(v)]))
-  })
-  const taxRate = parseFloat(data.taxRate ?? "0") / 100
-  const dueDate = data.dueDate ? new Date(data.dueDate).getTime() : null
+  const data = await parseSignals(c)
+  const taxRate = parseFloat(data.taxrate ?? "0") / 100
+  const dueDate = data.duedate ? new Date(data.duedate).getTime() : null
   const vehicle = JSON.stringify({
-    year: data.vYear || "", make: data.vMake || "", model: data.vModel || "",
-    color: data.vColor || "", vin: data.vVin || "", mileage: data.vMileage || "",
+    year: data.vyear || "", make: data.vmake || "", model: data.vmodel || "",
+    color: data.vcolor || "", vin: data.vvin || "", mileage: data.vmileage || "",
   })
   await query(
     `UPDATE invoices SET title=?, vehicleInfo=?, notes=?, taxRate=?, dueDate=?, updatedAt=? WHERE id=?`,
@@ -195,25 +196,22 @@ app.post("/invoices/:id/status", async (c) => {
 // ── Invoice: Add Line Item ─────────────────────────────────────────────────
 app.post("/invoices/:id/line-items", async (c) => {
   const { id } = c.req.param()
-  const data = await c.req.json<Record<string, string>>().catch(async () => {
-    const b = await c.req.parseBody()
-    return Object.fromEntries(Object.entries(b).map(([k, v]) => [k, String(v)]))
-  })
+  const data = await parseSignals(c)
   const settings = await getSettings()
   const itemId = crypto.randomUUID()
   const now = Date.now()
-  const type = data.newType ?? "labor"
+  const type = data.newtype || "labor"
 
   await query(
     `INSERT INTO line_items (id, invoiceId, type, sortOrder, description, laborHours, laborRate, partNumber, quantity, unitPrice, flatPrice, createdAt, updatedAt)
      VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [itemId, id, type, data.newDesc || "—",
-     type === "labor" ? parseFloat(data.newHours ?? "0") : null,
-     type === "labor" ? parseFloat(data.newRate ?? String(settings.defaultLaborRate)) : null,
-     (type === "parts" || type === "paint") ? (data.newPartNum || null) : null,
-     (type === "parts" || type === "paint") ? parseFloat(data.newQty ?? "1") : null,
-     (type === "parts" || type === "paint") ? parseFloat(data.newUnitPrice ?? "0") : null,
-     type === "sublet" ? parseFloat(data.newFlat ?? "0") : null,
+    [itemId, id, type, data.newdesc || "—",
+     type === "labor" ? parseFloat(data.newhours || "0") : null,
+     type === "labor" ? parseFloat(data.newrate || String(settings.defaultLaborRate)) : null,
+     (type === "parts" || type === "paint") ? (data.newpartnum || null) : null,
+     (type === "parts" || type === "paint") ? parseFloat(data.newqty || "1") : null,
+     (type === "parts" || type === "paint") ? parseFloat(data.newunitprice || "0") : null,
+     type === "sublet" ? parseFloat(data.newflat || "0") : null,
      now, now]
   )
 
