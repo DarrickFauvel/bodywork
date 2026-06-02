@@ -40,6 +40,9 @@
     <p style="text-align:center;margin-top:1rem;font-size:0.875rem;color:var(--text-muted);">
       Don't have an account? <a href="/signup">Create one free</a>
     </p>
+    <p style="text-align:center;margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">
+      <a href="/">&#8592; Back to home</a>
+    </p>
   </div>
 </div>
 <script>
