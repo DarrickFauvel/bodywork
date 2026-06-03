@@ -6,12 +6,18 @@
   <title>Invoice — <%= it.settings.shopName || 'Bodywork' %></title>
   <link rel="stylesheet" href="/public/styles.css" />
   <script type="module" src="/public/components.js"></script>
+  <% if (it.settings.brandColor) { %>
+  <style>:root { --primary: <%= it.settings.brandColor %>; }</style>
+  <% } %>
 </head>
 <body>
 <div class="public-wrap">
   <div class="public-doc">
     <div class="public-doc-header">
       <div class="doc-shop-info">
+        <% if (it.settings.logoData) { %>
+        <img src="<%= it.settings.logoData %>" alt="<%= it.settings.shopName || 'Shop logo' %>" style="max-height:64px;max-width:180px;object-fit:contain;margin-bottom:0.5rem;display:block;" />
+        <% } %>
         <h2><%= it.settings.shopName || 'Auto Body Shop' %></h2>
         <% if (it.settings.phone) { %><p><%= it.settings.phone %></p><% } %>
         <% if (it.settings.email) { %><p><%= it.settings.email %></p><% } %>
