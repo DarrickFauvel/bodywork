@@ -79,7 +79,7 @@ app.get("/admin/dashboard", requireAdmin, async (c) => {
 
 // Admin: Share
 app.get("/admin/share", requireAdmin, async (c) => {
-  const appUrl = new URL(c.req.url).origin
+  const appUrl = (process.env.ORIGIN ?? new URL(c.req.url).origin).replace(/\/$/, "")
   return c.html(await renderLayout(c, {
     title: "Share",
     activeNav: "settings",
