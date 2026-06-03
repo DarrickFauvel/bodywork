@@ -78,21 +78,31 @@
 
     <!-- View mode -->
     <div data-show="!$editingDetails">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:0.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:0.75rem;">
         <div class="card-title" style="margin-bottom:0;">Estimate Details</div>
         <button type="button" class="btn btn-ghost btn-sm" data-on:click="$editingDetails = true">Edit</button>
       </div>
-      <dl class="detail-summary">
-        <div><dt>Title</dt><dd id="view-title"><%= est.title %></dd></div>
-        <% const vParts = [vehicle.year, vehicle.make, vehicle.model].filter(Boolean) %>
-        <% if (vParts.length) { %>
-        <div><dt>Vehicle</dt><dd><%= vParts.join(' ') %><% if (vehicle.color) { %> · <%= vehicle.color %><% } %></dd></div>
-        <% } %>
-        <% if (vehicle.vin) { %><div><dt>VIN</dt><dd><%= vehicle.vin %></dd></div><% } %>
-        <% if (vehicle.mileage) { %><div><dt>Mileage</dt><dd><%= vehicle.mileage %></dd></div><% } %>
-        <div><dt>Tax Rate</dt><dd><%= parseFloat((est.taxRate * 100).toFixed(4)) %>%</dd></div>
-        <% if (est.notes) { %><div><dt>Notes</dt><dd style="white-space:pre-wrap;"><%= est.notes %></dd></div><% } %>
-      </dl>
+      <% const vParts = [vehicle.year, vehicle.make, vehicle.model].filter(Boolean) %>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:0.75rem;">
+        <div class="card-title" style="margin-bottom:0.5rem;">Estimate</div>
+        <dl class="detail-summary">
+          <div><dt>Title</dt><dd id="view-title"><%= est.title %></dd></div>
+          <div><dt>Tax Rate</dt><dd><%= parseFloat((est.taxRate * 100).toFixed(4)) %>%</dd></div>
+          <% if (est.notes) { %><div><dt>Notes</dt><dd style="white-space:pre-wrap;"><%= est.notes %></dd></div><% } %>
+        </dl>
+      </div>
+      <% if (vParts.length || vehicle.vin || vehicle.mileage) { %>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 1rem;">
+        <div class="card-title" style="margin-bottom:0.5rem;">Vehicle</div>
+        <dl class="detail-summary">
+          <% if (vParts.length) { %>
+          <div><dt>Vehicle</dt><dd><%= vParts.join(' ') %><% if (vehicle.color) { %> · <%= vehicle.color %><% } %></dd></div>
+          <% } %>
+          <% if (vehicle.vin) { %><div><dt>VIN</dt><dd><%= vehicle.vin %></dd></div><% } %>
+          <% if (vehicle.mileage) { %><div><dt>Mileage</dt><dd><%= vehicle.mileage %></dd></div><% } %>
+        </dl>
+      </div>
+      <% } %>
     </div>
 
     <!-- Edit mode -->
