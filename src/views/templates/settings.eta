@@ -8,7 +8,7 @@
   <div class="card" style="max-width:540px;">
     <form method="POST" action="/admin/settings" enctype="multipart/form-data">
       <fieldset style="border:none;padding:0;margin:0 0 1.25rem;">
-        <legend class="card-title" style="padding:0;margin-bottom:1rem;float:left;width:100%;">Shop Info</legend>
+        <legend class="card-title" style="padding:0;margin-bottom:1rem;display:block;width:100%;">Shop Info</legend>
         <div class="form-group">
           <label for="shopName">Shop Name</label>
           <input type="text" id="shopName" name="shopName" value="<%= it.settings.shopName || '' %>" placeholder="My Auto Body Shop" />
@@ -30,7 +30,7 @@
       </fieldset>
       <hr class="divider" />
       <fieldset style="border:none;padding:0;margin:1.25rem 0;">
-        <legend class="card-title" style="padding:0;margin-bottom:1rem;float:left;width:100%;">Defaults</legend>
+        <legend class="card-title" style="padding:0;margin-bottom:1rem;display:block;width:100%;">Defaults</legend>
         <div class="form-row">
           <div class="form-group">
             <label for="defaultLaborRate">Default Labor Rate ($/hr)</label>
@@ -47,7 +47,7 @@
       <% if (it.plan === 'paid') { %>
       <hr class="divider" />
       <fieldset style="border:none;padding:0;margin:1.25rem 0 0;">
-        <legend class="card-title" style="padding:0;margin-bottom:1rem;float:left;width:100%;">Branding</legend>
+        <legend class="card-title" style="padding:0;margin-bottom:1rem;display:block;width:100%;">Branding</legend>
         <div class="form-group">
           <label>Shop Logo</label>
           <% if (it.settings.logoData) { %>
