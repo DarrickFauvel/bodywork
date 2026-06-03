@@ -49,12 +49,13 @@
         <div class="form-group">
           <label>Shop Logo</label>
           <% if (it.settings.logoData) { %>
-          <div id="logo-current" style="margin-bottom:0.75rem;">
-            <img src="<%= it.settings.logoData %>" alt="Shop logo" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);" />
+          <div id="logo-current" style="position:relative;display:inline-block;margin-bottom:0.75rem;">
+            <img src="<%= it.settings.logoData %>" alt="Shop logo" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);display:block;" />
+            <button type="button" id="logo-remove-btn" onclick="removeLogo()" aria-label="Remove logo"
+              style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--danger);color:#fff;border:none;cursor:pointer;font-size:0.85rem;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;">&#x2715;</button>
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
-            <input type="file" id="logo-input" name="logo" accept="image/*" style="flex:1;" onchange="handleLogoChange(this)" />
-            <button type="button" id="logo-remove-btn" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeLogo()">Remove logo</button>
+          <div style="margin-bottom:0.5rem;">
+            <input type="file" id="logo-input" name="logo" accept="image/*" onchange="handleLogoChange(this)" />
           </div>
           <% } else { %>
           <input type="file" id="logo-input" name="logo" accept="image/*" onchange="handleLogoChange(this)" />
@@ -146,7 +147,6 @@
       const res = await fetch('/admin/settings/remove-logo', { method: 'POST' })
       if (res.ok) {
         document.getElementById('logo-current')?.remove()
-        document.getElementById('logo-remove-btn')?.remove()
         showToast('Logo removed')
       }
     }
