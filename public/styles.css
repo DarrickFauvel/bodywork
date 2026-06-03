@@ -293,9 +293,6 @@ dialog .btn-group {
   opacity: 1;
   transform: translateY(0);
 }
-@media (min-width: 768px) {
-  .toast { bottom: 1.5rem; }
-}
 .card-title {
   font-size: 0.8rem;
   font-weight: 700;
