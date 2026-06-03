@@ -49,18 +49,22 @@
         <div class="form-group">
           <label>Shop Logo</label>
           <% if (it.settings.logoData) { %>
-          <div style="margin-bottom:0.75rem;">
+          <div id="logo-current" style="margin-bottom:0.75rem;">
             <img src="<%= it.settings.logoData %>" alt="Shop logo" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);" />
           </div>
           <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
-            <input type="file" name="logo" accept="image/*" style="flex:1;" />
+            <input type="file" id="logo-input" name="logo" accept="image/*" style="flex:1;" onchange="previewLogo(this)" />
             <form method="POST" action="/admin/settings/remove-logo" style="display:inline;">
               <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);">Remove logo</button>
             </form>
           </div>
           <% } else { %>
-          <input type="file" name="logo" accept="image/*" />
+          <input type="file" id="logo-input" name="logo" accept="image/*" onchange="previewLogo(this)" />
           <% } %>
+          <div id="logo-preview" style="display:none;margin-top:0.75rem;">
+            <img id="logo-preview-img" src="" alt="Logo preview" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);" />
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Preview — save to apply</div>
+          </div>
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">PNG, JPG, or SVG. Displayed on estimates and invoices.</div>
         </div>
         <div class="form-group">
@@ -96,6 +100,21 @@
       </div>
     </dialog>
     <% } %>
+    <script>
+    function previewLogo(input) {
+      const preview = document.getElementById('logo-preview')
+      const img = document.getElementById('logo-preview-img')
+      const current = document.getElementById('logo-current')
+      if (input.files && input.files[0]) {
+        img.src = URL.createObjectURL(input.files[0])
+        preview.style.display = 'block'
+        if (current) current.style.display = 'none'
+      } else {
+        preview.style.display = 'none'
+        if (current) current.style.display = 'block'
+      }
+    }
+    </script>
     <hr class="divider" />
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
       <% if (it.isSuperAdmin) { %>
