@@ -27,6 +27,9 @@ export interface Settings {
   address: string | null
   defaultLaborRate: number
   defaultTaxRate: number
+  logoData: string | null
+  logoPublicId: string | null
+  brandColor: string | null
   updatedAt: number | null
 }
 

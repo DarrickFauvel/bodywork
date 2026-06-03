@@ -55,6 +55,9 @@ CREATE TABLE IF NOT EXISTS settings (
   address         TEXT,
   defaultLaborRate REAL NOT NULL DEFAULT 95.0,
   defaultTaxRate   REAL NOT NULL DEFAULT 0.0,
+  logoData        TEXT,
+  logoPublicId    TEXT,
+  brandColor      TEXT,
   updatedAt       INTEGER
 );
 

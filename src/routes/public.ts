@@ -3,6 +3,7 @@ import { query } from "../db/client"
 import { render } from "../views/renderer"
 import { fmtDate } from "../lib/html"
 import { lineItemRowReadOnly, totalsRow } from "../views/partials"
+import { resolveLogoUrl } from "../lib/cloudinary"
 import type { Customer, Estimate, Invoice, LineItem, Settings } from "../types"
 
 const app = new Hono()
@@ -20,7 +21,7 @@ app.get("/share/:token", async (c) => {
     ])
     const customer = custRow.rows[0] as unknown as Customer
     const items = itemRows.rows as unknown as LineItem[]
-    const settings = (settingsRow.rows[0] ?? {}) as unknown as Settings
+    const settings = resolveLogoUrl((settingsRow.rows[0] ?? {}) as unknown as Settings)
     const vehicle = estimate.vehicleInfo ? JSON.parse(estimate.vehicleInfo as string) : {}
     return c.html(await render("./public/estimate", {
       estimate, customer, vehicle, settings, fmtDate,
@@ -39,7 +40,7 @@ app.get("/share/:token", async (c) => {
     ])
     const customer = custRow.rows[0] as unknown as Customer
     const items = itemRows.rows as unknown as LineItem[]
-    const settings = (settingsRow.rows[0] ?? {}) as unknown as Settings
+    const settings = resolveLogoUrl((settingsRow.rows[0] ?? {}) as unknown as Settings)
     const vehicle = invoice.vehicleInfo ? JSON.parse(invoice.vehicleInfo as string) : {}
     return c.html(await render("./public/invoice", {
       invoice, customer, vehicle, settings, fmtDate,

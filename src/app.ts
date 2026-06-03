@@ -15,6 +15,7 @@ import { publicRoutes } from "./routes/public"
 import { billingRoutes } from "./routes/billing"
 import { superadminRoutes } from "./routes/superadmin"
 import { accountRoutes } from "./routes/account"
+import { uploadLogo, deleteLogo, resolveLogoUrl } from "./lib/cloudinary"
 import type { AppVariables, Settings } from "./types"
 
 const app = new Hono<{ Variables: AppVariables }>()
@@ -91,29 +92,78 @@ app.get("/admin/share", requireAdmin, async (c) => {
 app.get("/admin/settings", requireAdmin, async (c) => {
   const userId = c.get("user").id
   const row = await query("SELECT * FROM settings WHERE id = ?", [userId])
-  const settings = (row.rows[0] ?? {}) as unknown as Settings
+  const settings = resolveLogoUrl((row.rows[0] ?? {}) as unknown as Settings)
   return c.html(await renderLayout(c, {
     title: "Settings",
     activeNav: "settings",
-    content: await render("./settings", { settings, isSuperAdmin: c.get("isSuperAdmin") }),
+    content: await render("./settings", { settings, isSuperAdmin: c.get("isSuperAdmin"), plan: c.get("plan") }),
   }))
 })
 
 app.post("/admin/settings", requireAdmin, async (c) => {
   const userId = c.get("user").id
+  const plan = c.get("plan")
   const body = await c.req.parseBody()
   const taxRate = parseFloat(body.defaultTaxRate as string || "0") / 100
+
+  let newLogoPublicId: string | null = null
+  let brandColor: string | null = null
+
+  if (plan === "paid") {
+    const logoFile = body.logo instanceof File && body.logo.size > 0 ? body.logo : null
+    if (logoFile) {
+      newLogoPublicId = await uploadLogo(await logoFile.arrayBuffer(), logoFile.type, userId)
+    }
+    if (body.brandColor) brandColor = String(body.brandColor)
+  }
+
+  const existing = await query("SELECT logoData, logoPublicId, brandColor FROM settings WHERE id = ?", [userId])
+  const prev = (existing.rows[0] ?? {}) as Record<string, unknown>
+
+  // If uploading a new logo, delete the old Cloudinary asset
+  if (newLogoPublicId && prev.logoPublicId) {
+    await deleteLogo(prev.logoPublicId as string)
+  }
+
   await query(
-    `INSERT INTO settings (id, shopName, phone, email, address, defaultLaborRate, defaultTaxRate, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO settings (id, shopName, phone, email, address, defaultLaborRate, defaultTaxRate, logoData, logoPublicId, brandColor, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        shopName=excluded.shopName, phone=excluded.phone, email=excluded.email,
        address=excluded.address, defaultLaborRate=excluded.defaultLaborRate,
-       defaultTaxRate=excluded.defaultTaxRate, updatedAt=excluded.updatedAt`,
+       defaultTaxRate=excluded.defaultTaxRate,
+       logoData=excluded.logoData, logoPublicId=excluded.logoPublicId,
+       brandColor=excluded.brandColor, updatedAt=excluded.updatedAt`,
     [userId, body.shopName ? String(body.shopName) : null, body.phone ? String(body.phone) : null,
      body.email ? String(body.email) : null, body.address ? String(body.address) : null,
-     parseFloat(String(body.defaultLaborRate || "95")), taxRate, Date.now()]
+     parseFloat(String(body.defaultLaborRate || "95")), taxRate,
+     newLogoPublicId ? null : (prev.logoData as string | null) ?? null,
+     newLogoPublicId ?? (prev.logoPublicId as string | null) ?? null,
+     brandColor ?? (prev.brandColor as string | null) ?? null,
+     Date.now()]
   )
+  return c.redirect("/admin/settings")
+})
+
+app.post("/admin/settings/remove-logo", requireAdmin, async (c) => {
+  const userId = c.get("user").id
+  if (c.get("plan") === "paid") {
+    const row = await query("SELECT logoPublicId FROM settings WHERE id=?", [userId])
+    const publicId = (row.rows[0] as Record<string, unknown> | undefined)?.logoPublicId as string | null
+    if (publicId) await deleteLogo(publicId)
+    await query("UPDATE settings SET logoData=NULL, logoPublicId=NULL WHERE id=?", [userId])
+  }
+  return c.redirect("/admin/settings")
+})
+
+app.post("/admin/settings/reset-branding", requireAdmin, async (c) => {
+  const userId = c.get("user").id
+  if (c.get("plan") === "paid") {
+    const row = await query("SELECT logoPublicId FROM settings WHERE id=?", [userId])
+    const publicId = (row.rows[0] as Record<string, unknown> | undefined)?.logoPublicId as string | null
+    if (publicId) await deleteLogo(publicId)
+    await query("UPDATE settings SET logoData=NULL, logoPublicId=NULL, brandColor=NULL WHERE id=?", [userId])
+  }
   return c.redirect("/admin/settings")
 })
 

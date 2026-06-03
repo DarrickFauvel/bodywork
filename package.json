@@ -5,6 +5,8 @@
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
     "migrate": "bun src/db/migrate.ts",
+    "migrate:branding": "bun src/db/migrate-branding.ts",
+    "migrate:cloudinary": "bun src/db/migrate-cloudinary.ts",
     "migrate:mt": "bun src/db/migrate-multitenant.ts",
     "seed": "bun src/db/seed.ts",
     "typecheck": "tsc --noEmit"
@@ -12,6 +14,7 @@
   "dependencies": {
     "@libsql/client": "^0.17.0",
     "better-auth": "^1.6.0",
+    "cloudinary": "^2.10.0",
     "eta": "^3.5.0",
     "hono": "^4.12.0",
     "kysely": "^0.28.0",
