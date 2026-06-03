@@ -38,8 +38,8 @@
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label for="defaultTaxRate">Default Tax Rate (%)</label>
-            <input type="number" id="defaultTaxRate" name="defaultTaxRate" step="0.1" min="0" max="100"
-              value="<%= ((it.settings.defaultTaxRate ?? 0) * 100).toFixed(1) %>" />
+            <input type="number" id="defaultTaxRate" name="defaultTaxRate" step="0.01" min="0" max="100" placeholder="0.00"
+              value="<%= ((it.settings.defaultTaxRate ?? 0) * 100).toFixed(2) %>" />
           </div>
         </div>
       </fieldset>
@@ -49,29 +49,32 @@
         <div class="form-group">
           <label>Shop Logo</label>
           <% if (it.settings.logoData) { %>
-          <div style="margin-bottom:0.75rem;">
-            <img src="<%= it.settings.logoData %>" alt="Shop logo" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);" />
+          <div id="logo-current" style="position:relative;display:inline-block;margin-bottom:0.75rem;">
+            <img src="<%= it.settings.logoData %>" alt="Shop logo" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);display:block;" />
+            <button type="button" id="logo-remove-btn" onclick="removeLogo()" aria-label="Remove logo"
+              style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--danger);color:#fff;border:none;cursor:pointer;font-size:0.85rem;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;">&#x2715;</button>
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
-            <input type="file" name="logo" accept="image/*" style="flex:1;" />
-            <form method="POST" action="/admin/settings/remove-logo" style="display:inline;">
-              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);">Remove logo</button>
-            </form>
+          <div style="margin-bottom:0.5rem;">
+            <input type="file" id="logo-input" name="logo" accept="image/*" onchange="handleLogoChange(this)" />
           </div>
           <% } else { %>
-          <input type="file" name="logo" accept="image/*" />
+          <input type="file" id="logo-input" name="logo" accept="image/*" onchange="handleLogoChange(this)" />
           <% } %>
+          <div id="logo-preview" style="display:none;margin-top:0.75rem;">
+            <img id="logo-preview-img" src="" alt="Logo preview" style="max-height:80px;max-width:220px;border-radius:6px;border:1px solid var(--border);" />
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Preview — save to apply</div>
+          </div>
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">PNG, JPG, or SVG. Displayed on estimates and invoices.</div>
         </div>
         <div class="form-group">
           <label for="brandColor">Brand Color</label>
           <div style="display:flex;gap:0.75rem;align-items:center;">
-            <input type="color" id="brandColor" name="brandColor" value="<%= it.settings.brandColor || '#f97316' %>" style="width:48px;height:36px;padding:2px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;" />
+            <input type="color" id="brandColor" name="brandColor" value="<%= it.settings.brandColor || '#f97316' %>" style="width:48px;height:36px;padding:2px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;" onchange="saveBrandColor(this)" />
             <span style="font-size:0.85rem;color:var(--text-muted);">Used as the accent color on customer-facing documents</span>
           </div>
         </div>
-        <div style="margin-bottom:0;">
-          <button type="submit" form="reset-branding-form" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="return confirm('Reset branding? This will remove your logo and brand color.')">Reset branding</button>
+        <div style="margin-bottom:0;text-align:right;">
+          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="document.getElementById('confirm-reset-branding').showModal()">Reset branding</button>
         </div>
       </fieldset>
       <% } else { %>
@@ -87,7 +90,79 @@
     </form>
     <% if (it.plan === 'paid') { %>
     <form id="reset-branding-form" method="POST" action="/admin/settings/reset-branding"></form>
+    <dialog id="confirm-reset-branding">
+      <h3>Reset branding?</h3>
+      <p>This will permanently remove your logo and brand color.</p>
+      <div class="btn-group">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('confirm-reset-branding').close()">Cancel</button>
+        <button type="submit" form="reset-branding-form" class="btn btn-danger btn-sm">Reset branding</button>
+      </div>
+    </dialog>
     <% } %>
+    <script>
+    function showToast(msg) {
+      let el = document.getElementById('settings-toast')
+      if (!el) {
+        el = document.createElement('div')
+        el.id = 'settings-toast'
+        el.className = 'toast'
+        document.body.appendChild(el)
+      }
+      el.textContent = msg
+      el.classList.add('show')
+      clearTimeout(el._t)
+      el._t = setTimeout(() => el.classList.remove('show'), 3000)
+    }
+
+    async function handleLogoChange(input) {
+      if (!input.files || !input.files[0]) return
+      const file = input.files[0]
+      const preview = document.getElementById('logo-preview')
+      const img = document.getElementById('logo-preview-img')
+      const current = document.getElementById('logo-current')
+      const hint = preview.nextElementSibling
+
+      img.src = URL.createObjectURL(file)
+      preview.style.display = 'block'
+      if (current) current.style.display = 'none'
+      if (hint) hint.textContent = 'Uploading…'
+
+      const fd = new FormData()
+      fd.append('logo', file)
+      const res = await fetch('/admin/settings/logo', { method: 'POST', body: fd })
+      if (res.ok) {
+        const { logoUrl } = await res.json()
+        img.src = logoUrl
+        if (hint) hint.textContent = 'PNG, JPG, or SVG. Displayed on estimates and invoices.'
+        input.value = ''
+        showToast('Logo saved')
+      } else {
+        preview.style.display = 'none'
+        if (current) current.style.display = 'block'
+        if (hint) hint.textContent = 'Upload failed — try again'
+      }
+    }
+
+    async function removeLogo() {
+      const res = await fetch('/admin/settings/remove-logo', { method: 'POST' })
+      if (res.ok) {
+        document.getElementById('logo-current')?.remove()
+        showToast('Logo removed')
+      }
+    }
+
+    async function saveBrandColor(input) {
+      const fd = new FormData()
+      fd.append('brandColor', input.value)
+      const res = await fetch('/admin/settings/brand-color', { method: 'POST', body: fd })
+      if (res.ok) showToast('Brand color saved')
+    }
+
+    if (new URLSearchParams(location.search).get('saved')) {
+      history.replaceState(null, '', location.pathname)
+      showToast('Settings saved')
+    }
+    </script>
     <hr class="divider" />
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
       <% if (it.isSuperAdmin) { %>

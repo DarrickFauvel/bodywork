@@ -15,7 +15,7 @@ import { publicRoutes } from "./routes/public"
 import { billingRoutes } from "./routes/billing"
 import { superadminRoutes } from "./routes/superadmin"
 import { accountRoutes } from "./routes/account"
-import { uploadLogo, deleteLogo, resolveLogoUrl } from "./lib/cloudinary"
+import { uploadLogo, deleteLogo, resolveLogoUrl, signedLogoUrl } from "./lib/cloudinary"
 import type { AppVariables, Settings } from "./types"
 
 const app = new Hono<{ Variables: AppVariables }>()
@@ -142,7 +142,38 @@ app.post("/admin/settings", requireAdmin, async (c) => {
      brandColor ?? (prev.brandColor as string | null) ?? null,
      Date.now()]
   )
-  return c.redirect("/admin/settings")
+  return c.redirect("/admin/settings?saved=1")
+})
+
+app.post("/admin/settings/logo", requireAdmin, async (c) => {
+  if (c.get("plan") !== "paid") return c.json({ error: "forbidden" }, 403)
+  const userId = c.get("user").id
+  const body = await c.req.parseBody()
+  const logoFile = body.logo instanceof File && body.logo.size > 0 ? body.logo : null
+  if (!logoFile) return c.json({ error: "no file" }, 400)
+  const existing = await query("SELECT logoPublicId FROM settings WHERE id=?", [userId])
+  const prev = (existing.rows[0] ?? {}) as Record<string, unknown>
+  if (prev.logoPublicId) await deleteLogo(prev.logoPublicId as string)
+  const publicId = await uploadLogo(await logoFile.arrayBuffer(), logoFile.type, userId)
+  await query(
+    `INSERT INTO settings (id, logoData, logoPublicId, updatedAt) VALUES (?, NULL, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET logoData=NULL, logoPublicId=excluded.logoPublicId, updatedAt=excluded.updatedAt`,
+    [userId, publicId, Date.now()]
+  )
+  return c.json({ logoUrl: signedLogoUrl(publicId) })
+})
+
+app.post("/admin/settings/brand-color", requireAdmin, async (c) => {
+  if (c.get("plan") !== "paid") return c.json({ error: "forbidden" }, 403)
+  const userId = c.get("user").id
+  const body = await c.req.parseBody()
+  const brandColor = body.brandColor ? String(body.brandColor) : null
+  await query(
+    `INSERT INTO settings (id, brandColor, updatedAt) VALUES (?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET brandColor=excluded.brandColor, updatedAt=excluded.updatedAt`,
+    [userId, brandColor, Date.now()]
+  )
+  return c.json({ ok: true })
 })
 
 app.post("/admin/settings/remove-logo", requireAdmin, async (c) => {
@@ -153,7 +184,7 @@ app.post("/admin/settings/remove-logo", requireAdmin, async (c) => {
     if (publicId) await deleteLogo(publicId)
     await query("UPDATE settings SET logoData=NULL, logoPublicId=NULL WHERE id=?", [userId])
   }
-  return c.redirect("/admin/settings")
+  return c.json({ ok: true })
 })
 
 app.post("/admin/settings/reset-branding", requireAdmin, async (c) => {

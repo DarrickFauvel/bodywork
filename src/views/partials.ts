@@ -34,7 +34,7 @@ export function lineItemRow(item: LineItem): string {
 
 export function totalsRow(items: LineItem[], taxRate: number): string {
   const { subtotal, tax, total } = documentTotals(items, taxRate)
-  const taxPct = (taxRate * 100).toFixed(1)
+  const taxPct = parseFloat((taxRate * 100).toFixed(4)).toString()
   return /* html */ `<tfoot id="totals-row">
   <tr>
     <td colspan="3" class="td-right text-muted">Subtotal</td>
