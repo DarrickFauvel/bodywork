@@ -184,7 +184,7 @@ app.post("/admin/settings/remove-logo", requireAdmin, async (c) => {
     if (publicId) await deleteLogo(publicId)
     await query("UPDATE settings SET logoData=NULL, logoPublicId=NULL WHERE id=?", [userId])
   }
-  return c.redirect("/admin/settings")
+  return c.json({ ok: true })
 })
 
 app.post("/admin/settings/reset-branding", requireAdmin, async (c) => {

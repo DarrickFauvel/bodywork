@@ -54,9 +54,7 @@
           </div>
           <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
             <input type="file" id="logo-input" name="logo" accept="image/*" style="flex:1;" onchange="handleLogoChange(this)" />
-            <form method="POST" action="/admin/settings/remove-logo" style="display:inline;">
-              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);">Remove logo</button>
-            </form>
+            <button type="button" id="logo-remove-btn" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeLogo()">Remove logo</button>
           </div>
           <% } else { %>
           <input type="file" id="logo-input" name="logo" accept="image/*" onchange="handleLogoChange(this)" />
@@ -141,6 +139,15 @@
         preview.style.display = 'none'
         if (current) current.style.display = 'block'
         if (hint) hint.textContent = 'Upload failed — try again'
+      }
+    }
+
+    async function removeLogo() {
+      const res = await fetch('/admin/settings/remove-logo', { method: 'POST' })
+      if (res.ok) {
+        document.getElementById('logo-current')?.remove()
+        document.getElementById('logo-remove-btn')?.remove()
+        showToast('Logo removed')
       }
     }
 
