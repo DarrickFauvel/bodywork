@@ -247,6 +247,30 @@ input, select, textarea, button { font: inherit; }
   padding: 1.25rem;
   margin-bottom: 1.25rem;
 }
+dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 1.5rem;
+  max-width: 360px;
+  width: 100%;
+}
+dialog::backdrop {
+  background: rgba(0,0,0,0.6);
+}
+dialog h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+dialog p {
+  margin: 0 0 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+dialog .btn-group {
+  justify-content: flex-end;
+}
 .card-title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -366,6 +390,34 @@ select option   { background: var(--surface-2); }
 textarea        { resize: vertical; min-height: 90px; }
 input[type="number"] { -moz-appearance: textfield; }
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="file"] {
+  width: 100%;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.9rem;
+  min-height: var(--touch-min);
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--text);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  margin-right: 0.75rem;
+  transition: background 0.15s;
+}
+input[type="file"]::file-selector-button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 .btn {

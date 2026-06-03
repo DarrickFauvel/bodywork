@@ -71,7 +71,7 @@
           </div>
         </div>
         <div style="margin-bottom:0;">
-          <button type="submit" form="reset-branding-form" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="return confirm('Reset branding? This will remove your logo and brand color.')">Reset branding</button>
+          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="document.getElementById('confirm-reset-branding').showModal()">Reset branding</button>
         </div>
       </fieldset>
       <% } else { %>
@@ -87,6 +87,14 @@
     </form>
     <% if (it.plan === 'paid') { %>
     <form id="reset-branding-form" method="POST" action="/admin/settings/reset-branding"></form>
+    <dialog id="confirm-reset-branding">
+      <h3>Reset branding?</h3>
+      <p>This will permanently remove your logo and brand color.</p>
+      <div class="btn-group">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('confirm-reset-branding').close()">Cancel</button>
+        <button type="submit" form="reset-branding-form" class="btn btn-danger btn-sm">Reset branding</button>
+      </div>
+    </dialog>
     <% } %>
     <hr class="divider" />
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
