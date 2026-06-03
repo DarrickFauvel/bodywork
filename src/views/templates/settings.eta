@@ -5,9 +5,9 @@
   </div>
 </div>
 <div class="page-body">
-  <div class="card" style="max-width:540px;">
+  <div style="max-width:540px;">
     <form method="POST" action="/admin/settings" enctype="multipart/form-data">
-      <fieldset style="border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin:0 0 1.25rem;">
+      <fieldset class="card" style="border:1px solid var(--border);">
         <legend class="card-title" style="padding:0 0.5rem;background:var(--surface);">Shop Info</legend>
         <div class="form-group">
           <label for="shopName">Shop Name</label>
@@ -28,7 +28,7 @@
           <input type="text" id="address" name="address" value="<%= it.settings.address || '' %>" />
         </div>
       </fieldset>
-      <fieldset style="border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin:0 0 1.25rem;">
+      <fieldset class="card" style="border:1px solid var(--border);">
         <legend class="card-title" style="padding:0 0.5rem;background:var(--surface);">Defaults</legend>
         <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="margin-bottom:0;">
@@ -44,7 +44,7 @@
         </div>
       </fieldset>
       <% if (it.plan === 'paid') { %>
-      <fieldset style="border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin:0 0 1.25rem;">
+      <fieldset class="card" style="border:1px solid var(--border);">
         <legend class="card-title" style="padding:0 0.5rem;background:var(--surface);">Branding</legend>
         <div class="form-group">
           <label>Shop Logo</label>
@@ -72,7 +72,7 @@
         </div>
       </fieldset>
       <% } else { %>
-      <div style="background:var(--surface-2);border-radius:var(--radius);padding:1rem 1.25rem;border:1px solid var(--border);margin-bottom:1.25rem;">
+      <div class="card" style="background:var(--surface-2);">
         <div style="font-weight:600;margin-bottom:0.25rem;">Branding <span style="font-size:0.75rem;font-weight:500;color:var(--text-muted);background:var(--surface-3);padding:2px 8px;border-radius:99px;margin-left:0.4rem;">Pro</span></div>
         <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">Add your shop logo and brand color to estimates and invoices.</div>
         <a href="/upgrade" class="btn btn-primary btn-sm">Upgrade to Pro</a>
