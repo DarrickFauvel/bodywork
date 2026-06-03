@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f97316" />
+  <title>Privacy Policy — Bodywork</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="icon" href="/public/icon.svg" type="image/svg+xml" />
+  <style>
+    body { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem; letter-spacing: -0.02em; }
+    h2 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.6rem; }
+    p, li { font-size: 0.9rem; color: var(--text-muted); line-height: 1.75; }
+    ul { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .updated { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+    a { color: var(--accent); }
+    .back { display: inline-block; margin-bottom: 2rem; font-size: 0.875rem; color: var(--text-muted); text-decoration: none; }
+    .back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">&#8592; Back to Bodywork</a>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: June 3, 2026</p>
+
+  <p>
+    Bodywork is an autobody estimate and invoice tool built for independent repair shops.
+    This policy explains what data we collect, how we use it, and what rights you have over it.
+  </p>
+
+  <h2>1. Data We Collect</h2>
+  <p>When you create an account and use Bodywork, we store:</p>
+  <ul>
+    <li><strong>Account data</strong> — your name, email address, and hashed password.</li>
+    <li><strong>Session data</strong> — an authentication token, IP address, and browser user-agent tied to your active session.</li>
+    <li><strong>Business settings</strong> — your shop name, phone, email, address, and default labor and tax rates.</li>
+    <li><strong>Customer records</strong> — names, emails, phone numbers, addresses, and notes you enter for your customers.</li>
+    <li><strong>Estimates and invoices</strong> — vehicle details, repair descriptions, labor hours, parts, pricing, and status history.</li>
+  </ul>
+  <p>We do not collect analytics, track browsing behavior, or use advertising cookies.</p>
+
+  <h2>2. Why We Collect It</h2>
+  <p>
+    All data is collected solely to provide the Bodywork service — to let you create, manage, and share
+    repair estimates and invoices with your customers. We do not use your data for marketing or sell it to third parties.
+  </p>
+
+  <h2>3. Cookies</h2>
+  <p>
+    Bodywork sets one cookie: <code>better-auth.session_token</code>. This is a strictly necessary
+    authentication cookie that keeps you signed in. It expires after 30 days or when you sign out.
+    No tracking or advertising cookies are used.
+  </p>
+
+  <h2>4. Third-Party Services</h2>
+  <p>
+    Bodywork loads the <a href="https://data-star.dev" target="_blank" rel="noopener">Datastar</a> UI
+    framework from the jsDelivr CDN (<code>cdn.jsdelivr.net</code>). This is a static JavaScript file;
+    no personal data is shared with jsDelivr beyond your IP address making the request.
+    Your estimate and invoice data is stored in a hosted database provided by
+    <a href="https://turso.tech" target="_blank" rel="noopener">Turso</a>.
+  </p>
+
+  <h2>5. Data Retention</h2>
+  <p>
+    Your data is retained for as long as you have an active account.
+    You can delete your account at any time from <a href="/admin/account">Account &amp; Privacy settings</a>,
+    which permanently removes all your data from our systems.
+  </p>
+
+  <h2>6. Your Rights (GDPR)</h2>
+  <p>If you are in the European Economic Area, you have the right to:</p>
+  <ul>
+    <li><strong>Access</strong> — export a copy of all your data as a JSON file from Account &amp; Privacy settings.</li>
+    <li><strong>Erasure</strong> — permanently delete your account and all associated data from Account &amp; Privacy settings.</li>
+    <li><strong>Portability</strong> — your data export is provided in machine-readable JSON format.</li>
+    <li><strong>Rectification</strong> — update your business information in Settings at any time.</li>
+  </ul>
+  <p>
+    To exercise any right or with questions about this policy, contact
+    <a href="mailto:darrick@darrickdevelops.com">darrick@darrickdevelops.com</a>.
+  </p>
+
+  <h2>7. Changes to This Policy</h2>
+  <p>
+    We may update this policy occasionally. The "Last updated" date above will always reflect the most recent revision.
+    Continued use of Bodywork after changes constitutes acceptance of the updated policy.
+  </p>
+
+  <p style="margin-top:3rem;font-size:0.78rem;border-top:1px solid var(--border);padding-top:1.5rem;">
+    &copy; <%= new Date().getFullYear() %> Bodywork &mdash; Developed by
+    <a href="https://darrickdevelops.com" target="_blank" rel="noopener">Darrick Develops</a>
+  </p>
+</body>
+</html>

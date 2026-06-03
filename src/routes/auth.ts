@@ -1,6 +1,8 @@
 import { Hono } from "hono"
 import { auth } from "../auth/config"
 import { render } from "../views/renderer"
+import { readFileSync } from "fs"
+import { join } from "path"
 
 const app = new Hono()
 
@@ -27,6 +29,10 @@ app.get("/logout", async (c) => {
   const res = c.redirect("/login")
   res.headers.append("Set-Cookie", "better-auth.session_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax")
   return res
+})
+
+app.get("/privacy", async (c) => {
+  return c.html(await render("./privacy", {}))
 })
 
 // Mount Better Auth handler for all /auth/* routes

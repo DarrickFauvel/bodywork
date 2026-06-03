@@ -111,10 +111,17 @@
   <toast-message id="toast-msg" style="display:none;" class="toast"></toast-message>
 </div>
 
+<div id="cookie-notice" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.25rem;align-items:center;justify-content:space-between;gap:1rem;font-size:0.8rem;color:var(--text-muted);">
+  <span>We use one authentication cookie to keep you signed in. <a href="/privacy" style="color:var(--text-muted);text-decoration:underline;">Privacy Policy</a></span>
+  <button onclick="document.getElementById('cookie-notice').style.display='none';localStorage.setItem('cookie-ok','1')" class="btn btn-ghost btn-sm" style="flex-shrink:0;">Got it</button>
+</div>
+
 <script>
-  // Register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/public/sw.js').catch(() => {})
+  }
+  if (!localStorage.getItem('cookie-ok')) {
+    document.getElementById('cookie-notice').style.display = 'flex';
   }
 </script>
 </body>
