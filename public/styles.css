@@ -271,6 +271,31 @@ dialog p {
 dialog .btn-group {
   justify-content: flex-end;
 }
+.toast {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-h) + 1rem);
+  right: 1rem;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 0.65rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (min-width: 768px) {
+  .toast { bottom: 1.5rem; }
+}
 .card-title {
   font-size: 0.8rem;
   font-weight: 700;
