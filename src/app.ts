@@ -77,6 +77,16 @@ app.get("/admin/dashboard", requireAdmin, async (c) => {
   }))
 })
 
+// Admin: Share
+app.get("/admin/share", requireAdmin, async (c) => {
+  const appUrl = new URL(c.req.url).origin
+  return c.html(await renderLayout(c, {
+    title: "Share",
+    activeNav: "settings",
+    content: await render("./share", { appUrl }),
+  }))
+})
+
 // Admin: Settings
 app.get("/admin/settings", requireAdmin, async (c) => {
   const userId = c.get("user").id
