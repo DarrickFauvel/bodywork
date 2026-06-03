@@ -429,7 +429,6 @@
   const entranceStart = performance.now();
   const entranceDur   = 900;
   let curX = 16, curY = -24, tgtX = 0, tgtY = 0;
-  mockup.style.opacity = '0';
 
   window.addEventListener('mousemove', function (e) {
     const nx = (e.clientX / window.innerWidth  - 0.5) * 2;
@@ -455,7 +454,6 @@
 
     const t    = Math.min((performance.now() - entranceStart) / entranceDur, 1);
     const ease = 1 - Math.pow(1 - t, 3);
-    mockup.style.opacity = ease.toFixed(3);
     const ty   = ((1 - ease) * 40).toFixed(1);
 
     mockup.style.transform =
