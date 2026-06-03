@@ -1,0 +1,40 @@
+<div class="page-header">
+  <div>
+    <div class="page-title">Share Bodywork</div>
+    <div class="page-subtitle">Invite another shop to get started</div>
+  </div>
+</div>
+<div class="page-body">
+  <div class="card" style="max-width:400px;text-align:center;">
+
+    <canvas id="qr-canvas" style="display:block;margin:0 auto 1.25rem;border-radius:10px;"></canvas>
+
+    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1.25rem;word-break:break-all;">
+      <%= it.appUrl %>
+    </div>
+
+    <button id="copy-btn" class="btn btn-primary" style="width:100%;justify-content:center;" onclick="
+      navigator.clipboard.writeText('<%= it.appUrl %>').then(() => {
+        this.textContent = '&#10003; Copied!';
+        setTimeout(() => this.textContent = 'Copy Link', 1800);
+      });
+    ">Copy Link</button>
+
+    <div style="margin-top:1.5rem;font-size:0.8rem;color:var(--text-muted);line-height:1.6;">
+      Scan the QR code or share the link to let another shop sign up for free.
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;font-size:0.8rem;color:var(--text-muted);">
+    <a href="/admin/settings" style="color:var(--text-muted);">&#8592; Back to Settings</a>
+  </div>
+</div>
+
+<script type="module">
+  import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm'
+  QRCode.toCanvas(document.getElementById('qr-canvas'), '<%= it.appUrl %>', {
+    width: 240,
+    margin: 2,
+    color: { dark: '#f97316', light: '#1e1e1e' },
+  })
+</script>
