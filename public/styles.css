@@ -279,8 +279,8 @@ dialog .btn-group {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
-  padding: 0.65rem 1.1rem;
-  font-size: 0.9rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   z-index: 9999;
