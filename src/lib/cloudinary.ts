@@ -1,17 +1,27 @@
 import { v2 as cloudinary } from "cloudinary"
 import type { Settings } from "../types"
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-})
+const configured = !!(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+)
+
+if (configured) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
+  })
+} else {
+  console.warn("[cloudinary] credentials not set — using base64 stub")
+}
 
 export async function uploadLogo(buf: ArrayBuffer, mimeType: string, userId: string): Promise<string> {
   const b64 = Buffer.from(buf).toString("base64")
-  const dataUri = `data:${mimeType};base64,${b64}`
-  const result = await cloudinary.uploader.upload(dataUri, {
+  if (!configured) return `data:${mimeType};base64,${b64}`
+  const result = await cloudinary.uploader.upload(`data:${mimeType};base64,${b64}`, {
     folder: `bodywork/${userId}`,
     type: "authenticated",
     resource_type: "image",
@@ -20,16 +30,17 @@ export async function uploadLogo(buf: ArrayBuffer, mimeType: string, userId: str
 }
 
 export async function deleteLogo(publicId: string): Promise<void> {
+  if (!configured || publicId.startsWith("data:")) return
   try {
     await cloudinary.uploader.destroy(publicId, { type: "authenticated", resource_type: "image" })
   } catch {
-    // Log but don't throw — DB should still be cleared even if Cloudinary delete fails
     console.error("Cloudinary delete failed for", publicId)
   }
 }
 
 // Signed URL valid for 7 days — appropriate for customer-facing shared documents
 export function signedLogoUrl(publicId: string): string {
+  if (!configured || publicId.startsWith("data:")) return publicId
   return cloudinary.url(publicId, {
     type: "authenticated",
     sign_url: true,
