@@ -100,7 +100,7 @@ app.post("/", async (c) => {
     [id, userId, String(body.customerId), body.fromEstimateId ? String(body.fromEstimateId) : null,
      String(body.title), vehicle, body.notes ? String(body.notes) : null, taxRate, dueDate, now, now]
   )
-  return c.redirect(`/admin/invoices/${id}`)
+  return c.redirect(`/admin/invoices/${id}?new=1`)
 })
 
 app.post("/:id/delete", async (c) => {
