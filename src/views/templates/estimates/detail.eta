@@ -4,7 +4,8 @@
 
 <div data-signals='{
   "toast": "",
-  "redirect": ""
+  "redirect": "",
+  "editingDetails": false
 }'>
 <div data-effect="if ($redirect) { window.location.href = $redirect }"></div>
 <div data-show="$toast !== ''" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;">
@@ -72,71 +73,92 @@
   </div>
   <% } %>
 
-  <!-- Editable Header -->
-  <div id="estimate-header" class="card" style="padding-bottom:0.75rem;">
-    <details <%= it.collapsed ? '' : 'open' %>>
-      <summary style="list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding-bottom:0.25rem;">
-        <span class="card-title" style="margin-bottom:0;">Estimate Details</span>
-        <span style="color:var(--text-muted);font-size:0.75rem;user-select:none;">▾</span>
-      </summary>
-      <div style="margin-top:0.85rem;">
-        <div class="detail-header-wrap">
-          <div class="detail-header">
-            <div>
+  <!-- Estimate Details: view / edit -->
+  <div id="estimate-header" class="card">
+
+    <!-- View mode -->
+    <div data-show="!$editingDetails">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:0.5rem;">
+        <div class="card-title" style="margin-bottom:0;">Estimate Details</div>
+        <button type="button" class="btn btn-ghost btn-sm" data-on:click="$editingDetails = true">Edit</button>
+      </div>
+      <dl class="detail-summary">
+        <div><dt>Title</dt><dd id="view-title"><%= est.title %></dd></div>
+        <% const vParts = [vehicle.year, vehicle.make, vehicle.model].filter(Boolean) %>
+        <% if (vParts.length) { %>
+        <div><dt>Vehicle</dt><dd><%= vParts.join(' ') %><% if (vehicle.color) { %> · <%= vehicle.color %><% } %></dd></div>
+        <% } %>
+        <% if (vehicle.vin) { %><div><dt>VIN</dt><dd><%= vehicle.vin %></dd></div><% } %>
+        <% if (vehicle.mileage) { %><div><dt>Mileage</dt><dd><%= vehicle.mileage %></dd></div><% } %>
+        <div><dt>Tax Rate</dt><dd><%= parseFloat((est.taxRate * 100).toFixed(4)) %>%</dd></div>
+        <% if (est.notes) { %><div><dt>Notes</dt><dd style="white-space:pre-wrap;"><%= est.notes %></dd></div><% } %>
+      </dl>
+    </div>
+
+    <!-- Edit mode -->
+    <div data-show="$editingDetails">
+      <div class="card-title">Estimate Details</div>
+      <div class="detail-header-wrap">
+        <div class="detail-header">
+          <div>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" data-bind:title value="<%= est.title %>" />
+            </div>
+            <div class="form-group">
+              <label>Tax Rate (%)</label>
+              <input type="number" name="taxRate" data-bind:taxRate step="0.01" min="0" max="100"
+                value="<%= (est.taxRate * 100).toFixed(2) %>" style="width:120px;" />
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea name="notes" data-bind:notes><%= est.notes || '' %></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="form-row">
               <div class="form-group">
-                <label>Title</label>
-                <input type="text" name="title" data-bind:title value="<%= est.title %>" />
+                <label>Year</label>
+                <input type="text" name="vYear" data-bind:vYear value="<%= vehicle.year || '' %>" />
               </div>
               <div class="form-group">
-                <label>Tax Rate (%)</label>
-                <input type="number" name="taxRate" data-bind:taxRate step="0.01" min="0" max="100"
-                  value="<%= (est.taxRate * 100).toFixed(2) %>" style="width:120px;" />
-              </div>
-              <div class="form-group">
-                <label>Notes</label>
-                <textarea name="notes" data-bind:notes><%= est.notes || '' %></textarea>
+                <label>Make</label>
+                <input type="text" name="vMake" data-bind:vMake value="<%= vehicle.make || '' %>" />
               </div>
             </div>
-            <div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Year</label>
-                  <input type="text" name="vYear" data-bind:vYear value="<%= vehicle.year || '' %>" />
-                </div>
-                <div class="form-group">
-                  <label>Make</label>
-                  <input type="text" name="vMake" data-bind:vMake value="<%= vehicle.make || '' %>" />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Model</label>
-                  <input type="text" name="vModel" data-bind:vModel value="<%= vehicle.model || '' %>" />
-                </div>
-                <div class="form-group">
-                  <label>Color</label>
-                  <input type="text" name="vColor" data-bind:vColor value="<%= vehicle.color || '' %>" />
-                </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Model</label>
+                <input type="text" name="vModel" data-bind:vModel value="<%= vehicle.model || '' %>" />
               </div>
               <div class="form-group">
-                <label>VIN</label>
-                <input type="text" name="vVin" data-bind:vVin value="<%= vehicle.vin || '' %>" />
+                <label>Color</label>
+                <input type="text" name="vColor" data-bind:vColor value="<%= vehicle.color || '' %>" />
               </div>
-              <div class="form-group">
-                <label>Mileage</label>
-                <input type="text" name="vMileage" data-bind:vMileage value="<%= vehicle.mileage || '' %>" />
-              </div>
+            </div>
+            <div class="form-group">
+              <label>VIN</label>
+              <input type="text" name="vVin" data-bind:vVin value="<%= vehicle.vin || '' %>" />
+            </div>
+            <div class="form-group">
+              <label>Mileage</label>
+              <input type="text" name="vMileage" data-bind:vMileage value="<%= vehicle.mileage || '' %>" />
             </div>
           </div>
         </div>
-        <div class="btn-group" style="padding-bottom:0.5rem;">
-          <button class="btn btn-primary"
-            data-on:click="@post('/sse/estimates/<%= est.id %>/save')">
-            Save Changes
-          </button>
-        </div>
       </div>
-    </details>
+      <div class="btn-group">
+        <button class="btn btn-primary"
+          data-on:click="$editingDetails = false; @post('/sse/estimates/<%= est.id %>/save')">
+          Save Changes
+        </button>
+        <button type="button" class="btn btn-ghost"
+          data-on:click="$editingDetails = false">
+          Cancel
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <!-- Line Items -->

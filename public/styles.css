@@ -592,6 +592,20 @@ input[type="file"]::file-selector-button:hover {
   gap: 1.25rem;
 }
 
+/* ── Detail Summary (view mode) ─────────────────────────────────────────── */
+.detail-summary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem 2rem;
+  margin-bottom: 0.75rem;
+}
+.detail-summary > div { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.detail-summary dt { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); min-width: 72px; flex-shrink: 0; }
+.detail-summary dd { color: var(--text); font-size: 0.95rem; }
+@media (min-width: 480px) {
+  .detail-summary { grid-template-columns: 1fr 1fr; }
+}
+
 /* ── Status Bar ─────────────────────────────────────────────────────────── */
 .status-bar {
   display: flex;
