@@ -49,6 +49,7 @@
       <% if (it.isSuperAdmin) { %>
       <a href="/superadmin/accounts" class="btn btn-ghost btn-sm">&#128101; Accounts</a>
       <% } %>
+      <a href="/admin/account" class="btn btn-ghost btn-sm">&#128274; Account &amp; Privacy</a>
       <a href="/logout" class="btn btn-ghost btn-sm">&#8592; Sign out</a>
     </div>
   </div>

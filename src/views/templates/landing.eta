@@ -414,7 +414,11 @@
 </section>
 
 <footer class="land-footer">
-  &copy; <%= new Date().getFullYear() %> Bodywork &mdash; Estimates. Invoices. Done Right.
+  &copy; <%= new Date().getFullYear() %> Bodywork &mdash; Estimates. Invoices. Done Right.<br>
+  <span style="font-size:0.75rem;">
+    Developed by <a href="https://darrickdevelops.com" target="_blank" rel="noopener" style="color:var(--text-muted);">Darrick Develops</a>
+    &middot; <a href="/privacy" style="color:var(--text-muted);">Privacy Policy</a>
+  </span>
 </footer>
 
 <script>

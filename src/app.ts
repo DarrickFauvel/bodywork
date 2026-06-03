@@ -14,6 +14,7 @@ import { sseRoutes } from "./routes/sse"
 import { publicRoutes } from "./routes/public"
 import { billingRoutes } from "./routes/billing"
 import { superadminRoutes } from "./routes/superadmin"
+import { accountRoutes } from "./routes/account"
 import type { AppVariables, Settings } from "./types"
 
 const app = new Hono<{ Variables: AppVariables }>()
@@ -107,6 +108,7 @@ app.post("/admin/settings", requireAdmin, async (c) => {
 })
 
 // Admin sub-routers
+app.route("/admin/account", accountRoutes)
 app.route("/admin/customers", customerRoutes)
 app.route("/admin/estimates", estimateRoutes)
 app.route("/admin/invoices", invoiceRoutes)
