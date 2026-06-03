@@ -77,12 +77,13 @@ app.get("/:id", async (c) => {
   const shareUrl = estimate.shareToken
     ? `${process.env.ORIGIN ?? "http://localhost:3000"}/share/${estimate.shareToken}`
     : null
+  const collapsed = c.req.query("new") === "1"
 
   return c.html(await renderLayout(c, {
     title: estimate.title,
     activeNav: "estimates",
     content: await render("./estimates/detail", {
-      estimate, customer, vehicle, shareUrl, settings,
+      estimate, customer, vehicle, shareUrl, settings, collapsed,
       lineItemsHtml: items.map(lineItemRow).join(""),
       totalsHtml: totalsRow(items, estimate.taxRate),
       fmtDate,
@@ -112,7 +113,7 @@ app.post("/", async (c) => {
     [id, userId, String(body.customerId), String(body.title), vehicle,
      body.notes ? String(body.notes) : null, taxRate, now, now]
   )
-  return c.redirect(`/admin/estimates/${id}`)
+  return c.redirect(`/admin/estimates/${id}?new=1`)
 })
 
 app.post("/:id/delete", async (c) => {
